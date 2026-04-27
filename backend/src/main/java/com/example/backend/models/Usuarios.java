@@ -9,7 +9,14 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
-#
+@Getter
+@Setter
+@AllArgsConstructor
+@EqualsAndHashCode
+@ToString
+@NoArgsConstructor
+@Entity
+@Table(name="usuarios", schema = "")
 public class Usuarios {
 
 }
