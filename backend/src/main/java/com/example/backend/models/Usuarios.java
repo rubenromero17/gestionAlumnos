@@ -19,12 +19,9 @@ import java.util.Set;
 @Table(name="usuarios", schema = "")
 
 public class Usuarios {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
-    @Column(name = "nombre_usuario")
-    private String nombreUsuario;
+    @Id
+    private Long id;
 
     @Column(name = "contrasena_hash")
     private String contrasenaHash;

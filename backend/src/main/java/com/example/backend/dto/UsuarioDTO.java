@@ -1,4 +1,4 @@
 package com.example.backend.dto;
 
-public class usuarioDTO {
+public class UsuarioDTO {
 }
