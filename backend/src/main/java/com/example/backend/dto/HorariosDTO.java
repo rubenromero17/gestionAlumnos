@@ -1,6 +1,6 @@
 package com.example.backend.dto;
 
-import com.example.backend.models.Rol;
+import com.example.backend.models.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,11 +13,11 @@ import jakarta.validation.constraints.Size;
 @AllArgsConstructor
 @NoArgsConstructor
 
-public class HorarioDTO {
+public class HorariosDTO {
 
     private Long id;
 
-    private Alumnos alumno;
+    private Long alumnoId;
 
     private String diaSemana;
 

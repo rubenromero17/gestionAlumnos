@@ -30,12 +30,4 @@ public class Alumnos {
     @ManyToOne
     @JoinColumn(name = "modalidad_id")
     private Modalidades modalidades;
-
-    @ManyToMany
-    @JoinTable(
-            name = "asignaciones",
-            joinColumns = @JoinColumn(name = "alumno_id"),
-            inverseJoinColumns = @JoinColumn(name = "proyecto_id")
-    )
-    private Set<Proyectos> proyectos = new HashSet<>();
 }

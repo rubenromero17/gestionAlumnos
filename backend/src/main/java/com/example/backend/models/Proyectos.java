@@ -33,7 +33,7 @@ public class Proyectos {
     private Integer cupoMaximo;
 
     @Column
-    private String estado;
+    private EstadoProyecto estado;
 
     @ManyToMany(mappedBy = "proyectos")
     private Set<Alumnos> alumnos = new HashSet<>();

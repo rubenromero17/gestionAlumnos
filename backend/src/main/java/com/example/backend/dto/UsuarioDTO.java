@@ -1,6 +1,6 @@
 package com.example.backend.dto;
 
-import com.example.backend.models.Rol;
+import com.example.backend.models.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

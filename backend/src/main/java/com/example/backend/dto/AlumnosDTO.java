@@ -1,6 +1,6 @@
 package com.example.backend.dto;
 
-import com.example.backend.models.Rol;
+import com.example.backend.models.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -17,9 +19,7 @@ public class AlumnosDTO {
 
     private Long id;
 
-    private Usuarios usuario;
+    private Long usuarioId;
 
-    private Modalidades modalidades;
-
-    private Set<Proyectos> proyectos;
+    private Long modalidades;
 }
