@@ -16,21 +16,23 @@ import java.util.Set;
 @ToString
 @NoArgsConstructor
 @Entity
-@Table(name="usuarios", schema = "")
+@Table(name="horarios", schema = "")
 
-public class Usuarios {
+public class Horarios {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "nombre_usuario")
-    private String nombreUsuario;
+    @ManyToOne
+    @JoinColumn(name = "alumno_id")
+    private Alumno alumno;
 
-    @Column(name = "contrasena_hash")
-    private String contrasenaHash;
+    @Column(name = "dia_semana", nullable = false, length = 20)
+    private String diaSemana;
 
-    private String rol;
+    @Column(name = "hora_inicio", nullable = false, length = 10)
+    private String horaInicio;
 
-    @Column(name = "nombre_real")
-    private String nombreReal;
+    @Column(name = "hora_fin", nullable = false, length = 10)
+    private String horaFin;
 }

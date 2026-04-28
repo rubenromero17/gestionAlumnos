@@ -16,21 +16,25 @@ import java.util.Set;
 @ToString
 @NoArgsConstructor
 @Entity
-@Table(name="usuarios", schema = "")
+@Table(name="proyectos", schema = "")
 
-public class Usuarios {
+public class Proyectos {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "nombre_usuario")
-    private String nombreUsuario;
+    @Column(nullable = false)
+    private String titulo;
 
-    @Column(name = "contrasena_hash")
-    private String contrasenaHash;
+    @Column(length = 500)
+    private String descripcion;
 
-    private String rol;
+    @Column(name = "cupo_maximo", nullable = false)
+    private Integer cupoMaximo = 5;
 
-    @Column(name = "nombre_real")
-    private String nombreReal;
+    @Column
+    private String estado = "en curso";
+
+    @ManyToMany(mappedBy = "proyectos")
+    private Set<Alumnos> alumnos = new HashSet<>();
 }
