@@ -26,7 +26,7 @@ public class Usuarios {
     @Column(name = "contrasena_hash")
     private String contrasenaHash;
 
-    private String rol;
+    private Rol rol;
 
     @Column(name = "nombre_real")
     private String nombreReal;
