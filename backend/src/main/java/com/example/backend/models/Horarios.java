@@ -25,7 +25,7 @@ public class Horarios {
 
     @ManyToOne
     @JoinColumn(name = "alumno_id")
-    private Alumno alumno;
+    private Alumnos alumno;
 
     @Column(name = "dia_semana", nullable = false, length = 20)
     private String diaSemana;
