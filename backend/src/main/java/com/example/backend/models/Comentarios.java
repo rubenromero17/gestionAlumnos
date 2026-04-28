@@ -26,11 +26,11 @@ public class Comentarios {
 
     @ManyToOne
     @JoinColumn(name = "proyecto_id")
-    private Proyecto proyecto;
+    private Proyectos proyecto;
 
     @ManyToOne
     @JoinColumn(name = "usuario_id")
-    private Usuario usuario;
+    private Usuarios usuario;
 
     @Column(nullable = false, length = 500)
     private String texto;

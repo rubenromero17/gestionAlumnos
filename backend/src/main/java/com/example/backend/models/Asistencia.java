@@ -25,7 +25,7 @@ public class Asistencia {
 
     @ManyToOne
     @JoinColumn(name = "alumno_id")
-    private Alumno alumno;
+    private Alumnos alumno;
 
     @Column(name = "fecha")
     private LocalDate fecha = LocalDate.now();

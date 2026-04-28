@@ -30,10 +30,10 @@ public class Proyectos {
     private String descripcion;
 
     @Column(name = "cupo_maximo", nullable = false)
-    private Integer cupoMaximo = 5;
+    private Integer cupoMaximo;
 
     @Column
-    private String estado = "en curso";
+    private String estado;
 
     @ManyToMany(mappedBy = "proyectos")
     private Set<Alumnos> alumnos = new HashSet<>();
