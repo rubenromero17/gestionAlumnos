@@ -8,6 +8,7 @@ import org.hibernate.type.SqlTypes;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -16,21 +17,24 @@ import java.util.Set;
 @ToString
 @NoArgsConstructor
 @Entity
-@Table(name="usuarios", schema = "")
+@Table(name="comentarios", schema = "")
 
-public class Usuarios {
+public class Comentarios {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "nombre_usuario")
-    private String nombreUsuario;
+    @ManyToOne
+    @JoinColumn(name = "proyecto_id")
+    private Proyecto proyecto;
 
-    @Column(name = "contrasena_hash")
-    private String contrasenaHash;
+    @ManyToOne
+    @JoinColumn(name = "usuario_id")
+    private Usuario usuario;
 
-    private String rol;
+    @Column(nullable = false, length = 500)
+    private String texto;
 
-    @Column(name = "nombre_real")
-    private String nombreReal;
+    @Column(name = "fecha")
+    private LocalDateTime fecha = LocalDateTime.now();
 }

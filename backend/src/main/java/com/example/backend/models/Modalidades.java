@@ -16,21 +16,11 @@ import java.util.Set;
 @ToString
 @NoArgsConstructor
 @Entity
-@Table(name="usuarios", schema = "")
+@Table(name="modalidades", schema = "")
 
-public class Usuarios {
+public class Modalidades {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(name = "nombre_usuario")
-    private String nombreUsuario;
-
-    @Column(name = "contrasena_hash")
-    private String contrasenaHash;
-
-    private String rol;
-
-    @Column(name = "nombre_real")
-    private String nombreReal;
+    private String nombre;
 }
