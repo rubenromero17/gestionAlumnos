@@ -23,17 +23,9 @@
                 <ion-item class="custom-input">
                   <ion-input label="Confirmar Contraseña" labelPlacement="stacked" type="password" placeholder="********"></ion-input>
                 </ion-item>
-
-                <ion-item class="custom-input">
-                  <ion-label>Rol</ion-label>
-                  <ion-select placeholder="Selecciona uno">
-                    <ion-select-option value="1">Administrador</ion-select-option>
-                    <ion-select-option value="2">Alumno</ion-select-option>
-                  </ion-select>
-                </ion-item>
               </ion-list>
 
-              <ion-button expand="block" class="register-button">
+              <ion-button expand="block" class="register-button" [routerLink]="['/home']">
                 Registrarse
               </ion-button>
 
