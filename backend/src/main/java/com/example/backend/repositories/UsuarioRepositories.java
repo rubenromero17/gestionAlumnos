@@ -1,4 +1,4 @@
 package com.example.backend.repositories;
 
-public class usuarioRepositories {
+public class UsuarioRepositories {
 }
