@@ -1,0 +1,88 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import {
+  IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton,
+  IonIcon, IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardSubtitle,
+  IonCardTitle, IonCardContent, IonList, IonItem, IonInput, IonModal, IonSearchbar
+} from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { personCircle, personOutline, closeOutline, schoolOutline, lockClosedOutline, exitOutline } from 'ionicons/icons';
+import { RouterLink } from '@angular/router';
+import { ToastController } from '@ionic/angular/standalone';
+
+@Component({
+  selector: 'app-profile',
+  templateUrl: './profile.page.html',
+  styleUrls: ['./profile.page.scss'],
+  standalone: true,
+  imports: [
+    IonContent, IonButton, IonIcon, IonGrid, IonRow, IonCol, IonCard, IonCardHeader,
+    IonCardSubtitle, IonCardTitle, IonCardContent, IonList, IonItem, IonInput,
+    CommonModule, FormsModule, RouterLink, IonModal, IonHeader, IonTitle, IonToolbar, IonButtons, IonSearchbar
+  ]
+})
+export class ProfilePage implements OnInit {
+  isPasswordModalOpen = false;
+
+  userData = {
+    nombre_real: 'Usuario Pro',
+    nombre_usuario: 'usuario_pro_2024',
+    rol: 'alumno',
+    modalidad: 'Desarrollo Fullstack'
+  };
+
+  passwordData = {
+    actual: '',
+    nueva: '',
+    confirmar: ''
+  };
+
+  constructor(private toastController: ToastController) {
+    addIcons({ personCircle, personOutline, closeOutline, lockClosedOutline, schoolOutline, exitOutline });
+  }
+
+  ngOnInit(): void {}
+
+  abrirModalPassword() {
+    this.isPasswordModalOpen = true;
+  }
+
+  async actualizarPassword() {
+    const { actual, nueva, confirmar } = this.passwordData;
+
+    if (!actual || !nueva || !confirmar) {
+      await this.presentToast('Por favor, rellena todos los campos', 'warning');
+      return;
+    }
+
+    if (nueva !== confirmar) {
+      await this.presentToast('Las nuevas contraseñas no coinciden', 'danger');
+      return;
+    }
+
+    if (nueva.length < 6) {
+      await this.presentToast('La nueva contraseña debe tener al menos 6 caracteres', 'warning');
+      return;
+    }
+
+    try {
+      console.log('Enviando nueva contraseña...', { actual, nueva });
+      await this.presentToast('Contraseña actualizada con éxito', 'success');
+      this.isPasswordModalOpen = false;
+      this.passwordData = { actual: '', nueva: '', confirmar: '' }; // Reset
+    } catch (error) {
+      await this.presentToast('Error al actualizar la contraseña', 'danger');
+    }
+  }
+
+  async presentToast(mensaje: string, color: string) {
+    const toast = await this.toastController.create({
+      message: mensaje,
+      duration: 2500,
+      color: color,
+      position: 'top'
+    });
+    await toast.present();
+  }
+}
