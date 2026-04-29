@@ -1,13 +1,14 @@
 package com.example.backend.mapper;
 
 import com.example.backend.dto.ComentariosDTO;
+import com.example.backend.models.Comentarios;
 import com.example.backend.models.Horarios;
 import org.mapstruct.Mapper;
 
 import java.util.List;
 
 @Mapper(componentModel = "spring")
-public interface HorariosMapper {
+public interface ComentariosMapper {
 
     Comentarios toEntity (ComentariosDTO comentariosDTO);
 
