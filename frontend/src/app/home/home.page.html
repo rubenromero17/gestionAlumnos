@@ -1,35 +1,42 @@
-<ion-header class="ion-no-border">
-  <ion-toolbar class="main-header">
-    <div class="header-content">
-      <div class="brand-section">
-        <h1 class="logo-text">Proyectos<span>Hub</span></h1>
-      </div>
-
-      <div class="search-bar-container">
-        <ion-searchbar placeholder="Buscar proyectos..." class="custom-search"></ion-searchbar>
-      </div>
-
-      <ion-buttons slot="end">
-        <div class="user-card-trigger" [routerLink]="['/profile']">
-          <div class="user-info-text">
-            <span class="welcome-msg">Bienvenido,</span>
-            <span class="user-name">Usuario Pro</span>
-          </div>
-          <div class="avatar-wrapper">
-            <ion-icon name="person-circle"></ion-icon>
-            <div class="online-indicator"></div>
-          </div>
-        </div>
-      </ion-buttons>
-    </div>
-  </ion-toolbar>
-</ion-header>
+<app-header [mostrarFlecha]="false"></app-header>
 
 <ion-content [fullscreen]="true">
   <div class="home-wrapper">
     <div class="content-container">
 
-      <section class="project-section">
+      @if (mostrarTarjetaAsistencia) {
+        <section class="attendance-section" [class.exit-animation]="isExiting">
+          <ion-card class="attendance-hero-card">
+            <div class="hero-overlay"></div>
+            <div class="attendance-content">
+              <div class="left-column">
+                <div class="user-greeting">
+                  <span class="label">Hola de nuevo,</span>
+                  <h1 class="user-name">{{ nombreUsuario }}</h1>
+                </div>
+                <div class="time-box">
+                  <ion-icon name="time-outline"></ion-icon>
+                  <div class="time-text">
+                    <span class="schedule-label">HORARIO DE HOY</span>
+                    <span class="hours">08:00 - 15:00</span>
+                  </div>
+                </div>
+              </div>
+              <div class="right-column">
+                <p class="instruction-text">Haz clic para registrar tu entrada hoy.</p>
+                <ion-button class="fichar-button" (click)="fichar()">
+                  <ion-icon name="log-in-outline" slot="start"></ion-icon>
+                  FICHAR
+                </ion-button>
+              </div>
+            </div>
+          </ion-card>
+        </section>
+      }
+
+      <hr class="divider">
+
+      <section>
         <h2 class="section-title">Tus Proyectos Activos</h2>
         <ion-grid>
           <ion-row>
@@ -55,20 +62,30 @@
 
       <hr class="divider">
 
-      <section class="project-section">
-        <h2 class="section-title">Explorar Recomendaciones</h2>
+      <section class="project-section new-projects">
+        <div class="section-header">
+          <h2 class="section-title">Explorar Nuevos Proyectos</h2>
+          <p class="section-subtitle">Únete a nuevos desafíos y amplía tu portafolio.</p>
+        </div>
+
         <ion-grid>
           <ion-row>
-            <ion-col size="12" size-sm="6" size-lg="4" size-xl="3" *ngFor="let p of recomendados">
-              <ion-card class="interactive-card project-card recommended">
+            <ion-col size="12" size-sm="6" size-lg="4" *ngFor="let p of nuevosProyectos">
+              <ion-card class="interactive-card new-project-card">
                 <div class="image-container">
-                  <img [src]="p.imagen" alt="Recomendado"/>
+                  <img [src]="p.imagen" alt="Nuevo Proyecto"/>
+                  <div class="new-badge">NUEVO</div>
                 </div>
                 <ion-card-header>
+                  <div class="cat-label">{{ p.categoria }}</div>
                   <ion-card-title>{{ p.titulo }}</ion-card-title>
                 </ion-card-header>
+                <ion-card-content>
+                  <p>{{ p.descripcion }}</p>
+                </ion-card-content>
                 <div class="card-footer">
-                  <ion-button expand="block" class="login-button" (click)="verDetalles(p, false)">
+                  <ion-button expand="block" class="inscribir-btn" (click)="inscribirse(p)">
+                    <ion-icon name="add-circle-outline" slot="start"></ion-icon>
                     Inscribirse
                   </ion-button>
                 </div>
@@ -81,14 +98,18 @@
     </div>
   </div>
 
-  <ion-modal [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false" class="project-modal">
+  <ion-modal
+    [isOpen]="isModalOpen"
+    (didDismiss)="isModalOpen = false"
+    class="project-modal"
+  >
     <ng-template>
       <ion-header class="ion-no-border">
-        <ion-toolbar>
-          <ion-title>Detalles del Proyecto</ion-title>
+        <ion-toolbar color="light">
+          <ion-title class="modal-header-title">Detalles del Proyecto</ion-title>
           <ion-buttons slot="end">
             <ion-button (click)="isModalOpen = false">
-              <ion-icon name="close-outline"></ion-icon>
+              <ion-icon name="close-outline" slot="icon-only"></ion-icon>
             </ion-button>
           </ion-buttons>
         </ion-toolbar>
@@ -96,36 +117,80 @@
 
       <ion-content class="ion-padding">
         <div class="modal-container" *ngIf="proyectoSeleccionado">
+
           <div class="modal-image-wrapper">
             <img [src]="proyectoSeleccionado.imagen" class="modal-project-img" />
           </div>
 
           <div class="modal-info-content">
             <h1 class="modal-title">{{ proyectoSeleccionado.titulo }}</h1>
-            <ion-badge color="primary" class="modal-badge">{{ proyectoSeleccionado.categoria || 'General' }}</ion-badge>
+            <p class="modal-description-text">{{ proyectoSeleccionado.descripcion }}</p>
 
-            <p class="modal-description-text">
-              {{ proyectoSeleccionado.descripcion }}
-            </p>
+            <div class="status-section">
+              <ion-label class="section-label">
+                <ion-icon name="stats-chart-outline" class="section-icon"></ion-icon>
+                Estado de avance
+              </ion-label>
 
-            <div class="project-details-box">
-              <p><strong>Estado:</strong> Activo</p>
-              <p><strong>Ubicación:</strong> Remoto / Oficina</p>
+              <div class="progress-header">
+                <span class="progress-percent">{{ proyectoSeleccionado.progreso }}% Completado</span>
+                <ion-badge color="success" mode="ios" class="progress-badge">ACTIVO</ion-badge>
+              </div>
+
+              <ion-progress-bar [value]="proyectoSeleccionado.progreso / 100" color="success" class="custom-progress-bar"></ion-progress-bar>
+
+              <p class="progress-remaining">
+                Quedan aproximadamente {{ 100 - proyectoSeleccionado.progreso }}% para finalizar.
+              </p>
             </div>
-          </div>
 
-          <div class="modal-actions">
-            <ion-button *ngIf="esProyectoInscrito" expand="block" color="danger" fill="outline" class="btn-modal-action" (click)="gestionarProyecto('salir')">
-              <ion-icon name="exit-outline" slot="start"></ion-icon>
-              Salir del Proyecto
-            </ion-button>
+            <div class="features-section">
+              <ion-label class="section-label">
+                <ion-icon name="list-outline" class="section-icon"></ion-icon>
+                Características del Proyecto
+              </ion-label>
 
-            <ion-button *ngIf="!esProyectoInscrito" expand="block" class="login-button btn-modal-action" (click)="gestionarProyecto('inscribir')">
-              Inscribirse al Proyecto
-            </ion-button>
+              <ion-list lines="none" class="features-list">
+                <ion-item *ngFor="let car of proyectoSeleccionado.caracteristicas" class="feature-item">
+                  <ion-icon name="checkmark-done-circle" color="primary" slot="start" class="feature-icon"></ion-icon>
+                  <ion-label class="feature-text">{{ car }}</ion-label>
+                </ion-item>
+              </ion-list>
+            </div>
+
+            <div class="chat-section">
+              <ion-label class="section-label">
+                <ion-icon name="chatbubbles-outline" class="section-icon"></ion-icon>
+                Bitácora y Comentarios
+              </ion-label>
+
+              <div class="comments-feed">
+                <div *ngFor="let c of proyectoSeleccionado.comentarios" class="comment-bubble">
+                  <p class="comment-text">{{ c }}</p>
+                </div>
+
+                <div *ngIf="!proyectoSeleccionado.comentarios || proyectoSeleccionado.comentarios.length === 0" class="empty-chat">
+                  <ion-icon name="chatbubble-ellipses-outline" class="empty-chat-icon"></ion-icon>
+                  <p class="empty-chat-text">No hay notas registradas para este proyecto.</p>
+                </div>
+              </div>
+
+              <div class="chat-input-container">
+                <ion-input [(ngModel)]="nuevoComentario"
+                           placeholder="Escribir una nota interna..."
+                           (keyup.enter)="agregarComentario()"
+                           class="chat-input">
+                </ion-input>
+                <ion-button fill="solid" (click)="agregarComentario()" [disabled]="!nuevoComentario?.trim()" class="send-button">
+                  <ion-icon name="send" slot="icon-only" class="send-icon"></ion-icon>
+                </ion-button>
+              </div>
+            </div>
+
           </div>
         </div>
       </ion-content>
     </ng-template>
   </ion-modal>
+
 </ion-content>

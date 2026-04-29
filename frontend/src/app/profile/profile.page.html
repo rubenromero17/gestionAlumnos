@@ -1,25 +1,5 @@
-<ion-header class="ion-no-border">
-  <ion-toolbar class="main-header">
-    <div class="header-content">
-      <div class="brand-section">
-        <h1 class="logo-text" [routerLink]="['/home']">Proyectos<span>Hub</span></h1>
-      </div>
+<app-header [mostrarFlecha]="true"></app-header>
 
-      <ion-buttons slot="end">
-        <div class="user-card-trigger" [routerLink]="['/profile']">
-          <div class="user-info-text">
-            <span class="welcome-msg">Bienvenido,</span>
-            <span class="user-name">{{ userData.nombre_real }}</span>
-          </div>
-          <div class="avatar-wrapper">
-            <ion-icon name="person-circle"></ion-icon>
-            <div class="online-indicator"></div>
-          </div>
-        </div>
-      </ion-buttons>
-    </div>
-  </ion-toolbar>
-</ion-header>
 
 <ion-content [fullscreen]="true">
   <div class="home-wrapper">
@@ -154,3 +134,4 @@
     </ng-template>
   </ion-modal>
 </ion-content>
+

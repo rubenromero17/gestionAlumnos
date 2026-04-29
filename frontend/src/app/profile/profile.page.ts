@@ -10,6 +10,7 @@ import { addIcons } from 'ionicons';
 import { personCircle, personOutline, closeOutline, schoolOutline, lockClosedOutline, exitOutline } from 'ionicons/icons';
 import { RouterLink } from '@angular/router';
 import { ToastController } from '@ionic/angular/standalone';
+import {HeaderComponent} from "../components/header/header.component";
 
 @Component({
   selector: 'app-profile',
@@ -19,7 +20,7 @@ import { ToastController } from '@ionic/angular/standalone';
   imports: [
     IonContent, IonButton, IonIcon, IonGrid, IonRow, IonCol, IonCard, IonCardHeader,
     IonCardSubtitle, IonCardTitle, IonCardContent, IonList, IonItem, IonInput,
-    CommonModule, FormsModule, RouterLink, IonModal, IonHeader, IonTitle, IonToolbar, IonButtons, IonSearchbar
+    CommonModule, FormsModule, RouterLink, IonModal, IonHeader, IonTitle, IonToolbar, IonButtons, IonSearchbar, HeaderComponent
   ]
 })
 export class ProfilePage implements OnInit {
