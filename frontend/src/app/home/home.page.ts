@@ -5,11 +5,15 @@ import {
   IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton,
   IonIcon, IonGrid, IonRow, IonCol, IonCard, IonCardHeader,
   IonCardTitle, IonModal, IonBadge, IonCardContent, IonSearchbar,
-  IonItem, IonLabel, ToastController, IonList
+  IonItem, IonLabel, ToastController, IonList, IonInput, IonProgressBar
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { personCircle, closeOutline, exitOutline, timeOutline, logInOutline, addCircleOutline } from 'ionicons/icons';
-import { IonProgressBar, IonInput } from '@ionic/angular/standalone';
+import {
+  personCircle, closeOutline, exitOutline, timeOutline,
+  logInOutline, addCircleOutline, chatbubblesOutline,
+  chatbubbleEllipsesOutline, send, statsChartOutline,
+  listOutline, checkmarkDoneCircle
+} from 'ionicons/icons';
 import { RouterLink } from '@angular/router';
 import { HeaderComponent } from "../components/header/header.component";
 
@@ -27,77 +31,133 @@ import { HeaderComponent } from "../components/header/header.component";
   ]
 })
 export class HomePage implements OnInit {
+  // Estado del Modal y Selección
   isModalOpen = false;
   proyectoSeleccionado: any = null;
   esProyectoInscrito = false;
-  nuevoComentario: string = "";
+  nuevoComentario: string = '';
 
-  nombreUsuario: string = "Usuario Pro";
-  mostrarTarjetaAsistencia: boolean = true;
-  isExiting: boolean = false;
+  // Lógica de Fichaje
+  mostrarTarjetaAsistencia = true;
+  isExiting = false;
+  nombreUsuario = "Usuario Pro";
 
-  // Proyectos en los que ya estás
+  // Listas de Proyectos (Base de datos local)
   misProyectos = [
     {
       titulo: 'Sistema de Gestión',
       categoria: 'Frontend',
       imagen: 'https://picsum.photos/id/10/600/400',
-      descripcion: 'Panel administrativo avanzado.',
-      progreso: 75, // Porcentaje completado
-      caracteristicas: ['Autenticación con JWT', 'Dashboard interactivo', 'Exportación PDF'],
-      comentarios: []
+      descripcion: 'Un panel administrativo avanzado para gestionar usuarios y recursos en tiempo real.',
+      progreso: 65,
+      caracteristicas: ['Dashboard interactivo', 'Gestión de roles', 'Exportación a PDF'],
+      comentarios: ['Maquetación terminada', 'Falta conectar API de usuarios']
     },
     {
       titulo: 'Pasarela de Pagos',
       categoria: 'Backend',
       imagen: 'https://picsum.photos/id/20/600/400',
-      descripcion: 'Seguridad de alto nivel para transacciones.',
-      progreso: 30, // Porcentaje completado
-      caracteristicas: ['Encriptación AES-256', 'Webhooks en tiempo real'],
+      descripcion: 'Integración de seguridad de alto nivel para transacciones monetarias internacionales.',
+      progreso: 40,
+      caracteristicas: ['Certificación PCI-DSS', 'Soporte multi-moneda', 'Webhooks de respuesta'],
+      comentarios: ['Iniciando pruebas de cifrado']
+    }
+  ];
+
+  nuevosProyectos = [
+    {
+      titulo: 'AI Image Gen',
+      categoria: 'Innovación',
+      imagen: 'https://picsum.photos/id/30/600/400',
+      descripcion: 'Generador de imágenes mediante inteligencia artificial basado en prompts.',
+      progreso: 0,
+      caracteristicas: ['Modelo Stable Diffusion', 'Interfaz optimizada', 'Cloud Storage'],
+      comentarios: []
+    },
+    {
+      titulo: 'Crypto Wallet',
+      categoria: 'Web3',
+      imagen: 'https://picsum.photos/id/50/600/400',
+      descripcion: 'Billetera digital segura para el manejo de activos en la blockchain.',
+      progreso: 0,
+      caracteristicas: ['Seguridad biométrica', 'Soporte multichain', 'Swap integrado'],
+      comentarios: []
+    },
+    {
+      titulo: 'Medical Tracker',
+      categoria: 'Salud',
+      imagen: 'https://picsum.photos/id/60/600/400',
+      descripcion: 'Diseño de interfaz para monitorización médica.',
+      progreso: 0,
+      caracteristicas: ['Gráficos en tiempo real', 'Alertas críticas', 'Historial médico'],
       comentarios: []
     }
   ];
 
-  // Nuevos proyectos disponibles
-  nuevosProyectos = [
-    { titulo: 'App de Clima Pro', categoria: 'Mobile', imagen: 'https://picsum.photos/id/40/600/400', descripcion: 'Predicción meteorológica con mapas 3D.' },
-    { titulo: 'E-commerce API', categoria: 'Backend', imagen: 'https://picsum.photos/id/60/600/400', descripcion: 'Infraestructura escalable para tiendas online.' },
-    { titulo: 'Dashboard de Salud', categoria: 'UX/UI', imagen: 'https://picsum.photos/id/80/600/400', descripcion: 'Diseño de interfaz para monitorización médica.' }
-  ];
+  // Listas que se muestran (las que filtramos)
+  misProyectosFiltrados: any[] = [];
+  nuevosProyectosFiltrados: any[] = [];
 
   constructor(private toastController: ToastController) {
-    addIcons({ personCircle, closeOutline, exitOutline, timeOutline, logInOutline, addCircleOutline });
+    addIcons({
+      personCircle, closeOutline, exitOutline, timeOutline,
+      logInOutline, addCircleOutline, chatbubblesOutline,
+      chatbubbleEllipsesOutline, send, statsChartOutline,
+      listOutline, checkmarkDoneCircle
+    });
   }
 
   ngOnInit() {
-    // LÓGICA DE UN SOLO USO AL DÍA
+    // Inicializar listas filtradas
+    this.misProyectosFiltrados = [...this.misProyectos];
+    this.nuevosProyectosFiltrados = [...this.nuevosProyectos];
+
+    // Verificar si ya fichó hoy
     const ultimoFichaje = localStorage.getItem('fechaFichaje');
     const hoy = new Date().toDateString();
-
     if (ultimoFichaje === hoy) {
       this.mostrarTarjetaAsistencia = false;
     }
   }
 
+  // --- LÓGICA DE BÚSQUEDA CORREGIDA ---
+  // Ahora recibe directamente el 'string' que le envía el header
+  buscarProyectos(textoBusqueda: string) {
+    // Aseguramos de que tengamos texto y lo pasamos a minúsculas
+    const texto = textoBusqueda ? textoBusqueda.toLowerCase().trim() : '';
+
+    if (!texto) {
+      this.misProyectosFiltrados = [...this.misProyectos];
+      this.nuevosProyectosFiltrados = [...this.nuevosProyectos];
+      return;
+    }
+
+    this.misProyectosFiltrados = this.misProyectos.filter(p =>
+      p.titulo.toLowerCase().includes(texto) ||
+      p.categoria.toLowerCase().includes(texto)
+    );
+
+    this.nuevosProyectosFiltrados = this.nuevosProyectos.filter(p =>
+      p.titulo.toLowerCase().includes(texto) ||
+      p.categoria.toLowerCase().includes(texto)
+    );
+  }
+
+  // --- ACCIONES ---
   async fichar() {
     const hoy = new Date().toDateString();
-
-    // Guardamos en LocalStorage
     localStorage.setItem('fechaFichaje', hoy);
 
     const toast = await this.toastController.create({
       message: '✅ Te has fichado correctamente',
       duration: 2000,
       position: 'top',
-      color: 'success',
-      cssClass: 'custom-toast'
+      color: 'success'
     });
     await toast.present();
 
     this.isExiting = true;
-    setTimeout(() => {
-      this.mostrarTarjetaAsistencia = false;
-    }, 500);
+    setTimeout(() => this.mostrarTarjetaAsistencia = false, 500);
   }
 
   async inscribirse(proyecto: any) {
@@ -108,7 +168,6 @@ export class HomePage implements OnInit {
       position: 'bottom'
     });
     await toast.present();
-    console.log("Inscrito en:", proyecto.titulo);
   }
 
   verDetalles(p: any, i: boolean) {
@@ -118,12 +177,12 @@ export class HomePage implements OnInit {
   }
 
   agregarComentario() {
-    if (this.nuevoComentario.trim().length > 0 && this.proyectoSeleccionado) {
+    if (this.nuevoComentario.trim() && this.proyectoSeleccionado) {
       if (!this.proyectoSeleccionado.comentarios) {
         this.proyectoSeleccionado.comentarios = [];
       }
       this.proyectoSeleccionado.comentarios.push(this.nuevoComentario);
-      this.nuevoComentario = ''; // Limpiamos el input
+      this.nuevoComentario = '';
     }
   }
 }

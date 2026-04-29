@@ -1,8 +1,8 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {IonButtons, IonHeader, IonIcon, IonSearchbar, IonToolbar} from "@ionic/angular/standalone";
-import {RouterLink} from "@angular/router";
-import {addIcons} from "ionicons";
-import {arrowBackOutline, personCircle} from "ionicons/icons";
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { IonButtons, IonHeader, IonIcon, IonSearchbar, IonToolbar } from "@ionic/angular/standalone";
+import { RouterLink } from "@angular/router";
+import { addIcons } from "ionicons";
+import { arrowBackOutline, personCircle } from "ionicons/icons";
 
 @Component({
   selector: 'app-header',
@@ -18,12 +18,21 @@ import {arrowBackOutline, personCircle} from "ionicons/icons";
     RouterLink
   ]
 })
-export class HeaderComponent  implements OnInit {
+export class HeaderComponent implements OnInit {
   @Input() mostrarFlecha: boolean = true;
+
+  // Emisor para notificar a la HomePage cuando el usuario escribe
+  @Output() search = new EventEmitter<string>();
 
   constructor() {
     addIcons({ arrowBackOutline, personCircle });
   }
+
   ngOnInit() {}
 
+  // Captura el evento del searchbar y emite el valor
+  onSearch(event: any) {
+    const searchTerm = event.detail.value || '';
+    this.search.emit(searchTerm);
+  }
 }
