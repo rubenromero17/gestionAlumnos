@@ -4,13 +4,17 @@ import { FormsModule } from '@angular/forms';
 import {
   IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton,
   IonIcon, IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardSubtitle,
-  IonCardTitle, IonCardContent, IonList, IonItem, IonInput, IonModal, IonSearchbar
+  IonCardTitle, IonCardContent, IonList, IonItem, IonInput, IonModal, IonSearchbar,
+  IonLabel, IonToggle
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { personCircle, personOutline, closeOutline, schoolOutline, lockClosedOutline, exitOutline } from 'ionicons/icons';
+import {
+  personCircle, personOutline, closeOutline, schoolOutline, lockClosedOutline, exitOutline,
+  timeOutline, shieldCheckmarkOutline, desktopOutline
+} from 'ionicons/icons';
 import { RouterLink } from '@angular/router';
 import { ToastController } from '@ionic/angular/standalone';
-import {HeaderComponent} from "../components/header/header.component";
+import { HeaderComponent } from "../components/header/header.component";
 
 @Component({
   selector: 'app-profile',
@@ -20,7 +24,8 @@ import {HeaderComponent} from "../components/header/header.component";
   imports: [
     IonContent, IonButton, IonIcon, IonGrid, IonRow, IonCol, IonCard, IonCardHeader,
     IonCardSubtitle, IonCardTitle, IonCardContent, IonList, IonItem, IonInput,
-    CommonModule, FormsModule, RouterLink, IonModal, IonHeader, IonTitle, IonToolbar, IonButtons, IonSearchbar, HeaderComponent
+    CommonModule, FormsModule, RouterLink, IonModal, IonHeader, IonTitle, IonToolbar,
+    IonButtons, IonSearchbar, HeaderComponent, IonLabel, IonToggle
   ]
 })
 export class ProfilePage implements OnInit {
@@ -33,6 +38,12 @@ export class ProfilePage implements OnInit {
     modalidad: 'Desarrollo Fullstack'
   };
 
+  securityData = {
+    ultimaConexion: 'Hoy a las 10:45 AM',
+    dosPasosActivo: false,
+    dispositivos: 2
+  };
+
   passwordData = {
     actual: '',
     nueva: '',
@@ -40,13 +51,23 @@ export class ProfilePage implements OnInit {
   };
 
   constructor(private toastController: ToastController) {
-    addIcons({ personCircle, personOutline, closeOutline, lockClosedOutline, schoolOutline, exitOutline });
+    addIcons({
+      personCircle, personOutline, closeOutline, lockClosedOutline, schoolOutline, exitOutline,
+      timeOutline, shieldCheckmarkOutline, desktopOutline
+    });
   }
 
   ngOnInit(): void {}
 
   abrirModalPassword() {
     this.isPasswordModalOpen = true;
+  }
+
+  // NUEVA FUNCIÓN PARA EL BOTÓN DE GUARDAR CAMBIOS
+  async guardarCambios() {
+    // Aquí puedes añadir en el futuro la lógica para llamar a tu base de datos/API
+    console.log('Nuevos datos del usuario:', this.userData);
+    await this.presentToast('Cambios guardados correctamente', 'success');
   }
 
   async actualizarPassword() {
@@ -71,7 +92,7 @@ export class ProfilePage implements OnInit {
       console.log('Enviando nueva contraseña...', { actual, nueva });
       await this.presentToast('Contraseña actualizada con éxito', 'success');
       this.isPasswordModalOpen = false;
-      this.passwordData = { actual: '', nueva: '', confirmar: '' }; // Reset
+      this.passwordData = { actual: '', nueva: '', confirmar: '' };
     } catch (error) {
       await this.presentToast('Error al actualizar la contraseña', 'danger');
     }
