@@ -2,6 +2,11 @@ $primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 $glass-bg: rgba(255, 255, 255, 0.1);
 $bg-app: #f4f7fe;
 
+/* Añadimos el fondo directamente al content para que nunca se vea blanco */
+ion-content {
+  --background: #f4f7fe;
+}
+
 .main-header {
   --background: #764ba2;
   background: $primary-gradient;
@@ -35,8 +40,6 @@ $bg-app: #f4f7fe;
 }
 
 .home-wrapper {
-  min-height: 100%;
-  background: $bg-app;
   padding: 40px;
 }
 
@@ -101,13 +104,13 @@ $bg-app: #f4f7fe;
 
 // --- ESTILOS DEL MODAL ---
 .project-modal {
-  --width: 90%;
-  --max-width: 500px;
-  --height: fit-content;
+  --width: 95%;
+  --max-width: 650px;
   --border-radius: 28px;
+  /* Al no poner height, Ionic lo centra perfectamente y lo ajusta al contenido. */
 
   .modal-container {
-    padding: 10px 20px 20px;
-    .modal-description-text { color: #666; font-size: 1rem; margin-bottom: 20px; }
+    padding: 20px 30px 30px;
+    .modal-description-text { color: #666; font-size: 1.05rem; margin-bottom: 25px; }
   }
 }
