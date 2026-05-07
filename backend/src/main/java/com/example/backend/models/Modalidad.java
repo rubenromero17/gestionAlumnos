@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -12,20 +14,12 @@ import java.time.LocalDate;
 @ToString
 @NoArgsConstructor
 @Entity
-@Table(name="asistencia", schema = "")
+@Table(name="modalidad", schema = "")
 
-public class Asistencia {
+public class Modalidad {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "alumno_id")
-    private Alumno alumno;
-
-    @Column(name = "fecha")
-    private LocalDate fecha = LocalDate.now();
-
-    @Column(nullable = false)
-    private Boolean presente = false;
+    private String nombre;
 }
