@@ -1,9 +1,9 @@
 package com.example.backend.repositories;
 
-import com.example.backend.models.Alumno;
+import com.example.backend.models.Comentarios;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface AlumnoRepository extends JpaRepository<Alumno, Long> {
+public interface ComentarioRepository extends JpaRepository<Comentarios,Long> {
 }
