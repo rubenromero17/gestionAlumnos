@@ -2,8 +2,8 @@ package com.example.backend.services;
 
 import com.example.backend.dto.AlumnoDTO;
 import com.example.backend.mapper.AlumnoMapper;
-import com.example.backend.models.Alumno;
 import com.example.backend.repositories.AlumnoRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class AlumnoService {
 
     @Autowired

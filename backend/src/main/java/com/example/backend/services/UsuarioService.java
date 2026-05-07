@@ -7,6 +7,7 @@ import com.example.backend.repositories.UsuarioRepository;
 import com.example.backend.exception.ElementoNoEncontradoException;
 import com.example.backend.exception.ResourceAlreadyExistsException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -17,11 +18,16 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UsuarioService {
 
-    private final UsuarioRepository usuarioRepository;
-    private final UsuarioMapper usuarioMapper;
-    private final PasswordEncoder passwordEncoder;
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
-    // ── CREATE ──────────────────────────────────────────────
+    @Autowired
+    private UsuarioMapper usuarioMapper;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+
     public UsuarioDTO crearUsuario(UsuarioDTO usuarioDTO) {
         Optional<Usuarios> existingByNombre = usuarioRepository.findByNombreReal(usuarioDTO.getNombreReal());
         if (existingByNombre.isPresent()) {
@@ -35,27 +41,23 @@ public class UsuarioService {
         return usuarioMapper.toDTO(usuarioGuardado);
     }
 
-    // ── READ (por ID) ────────────────────────────────────────
     public UsuarioDTO buscarUsuarioPorId(Long id) {
         Usuarios usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ElementoNoEncontradoException("Usuario no encontrado con id: " + id));
         return usuarioMapper.toDTO(usuario);
     }
 
-    // ── READ (por nombre) ────────────────────────────────────
     public UsuarioDTO buscarUsuarioPorNombre(String nombreReal) {
         Usuarios usuario = usuarioRepository.findByNombreReal(nombreReal)
                 .orElseThrow(() -> new ElementoNoEncontradoException("Usuario no encontrado con nombre: " + nombreReal));
         return usuarioMapper.toDTO(usuario);
     }
 
-    // ── READ (todos) ─────────────────────────────────────────
     public List<UsuarioDTO> obtenerTodosLosUsuarios() {
         List<Usuarios> usuarios = usuarioRepository.findAll();
         return usuarioMapper.toDTO(usuarios);
     }
 
-    // ── UPDATE ───────────────────────────────────────────────
     public UsuarioDTO actualizarUsuario(Long id, UsuarioDTO usuarioDTO) {
         Usuarios usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ElementoNoEncontradoException("Usuario no encontrado con id: " + id));
@@ -77,7 +79,6 @@ public class UsuarioService {
         return usuarioMapper.toDTO(usuarioActualizado);
     }
 
-    // ── DELETE ───────────────────────────────────────────────
     public void eliminarUsuario(Long id) {
         if (!usuarioRepository.existsById(id)) {
             throw new ElementoNoEncontradoException("Usuario no encontrado con id: " + id);
