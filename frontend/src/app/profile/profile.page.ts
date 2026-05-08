@@ -5,7 +5,7 @@ import {
   IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton,
   IonIcon, IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardSubtitle,
   IonCardTitle, IonCardContent, IonList, IonItem, IonInput, IonModal, IonSearchbar,
-  IonLabel, IonToggle
+  IonLabel, IonToggle, NavController
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -22,10 +22,14 @@ import { HeaderComponent } from "../components/header/header.component";
   styleUrls: ['./profile.page.scss'],
   standalone: true,
   imports: [
-    IonContent, IonButton, IonIcon, IonGrid, IonRow, IonCol, IonCard, IonCardHeader,
-    IonCardSubtitle, IonCardTitle, IonCardContent, IonList, IonItem, IonInput,
-    CommonModule, FormsModule, RouterLink, IonModal, IonHeader, IonTitle, IonToolbar,
-    IonButtons, IonSearchbar, HeaderComponent, IonLabel, IonToggle
+    IonContent, IonButton, IonIcon, IonGrid, IonRow, IonCol, IonCard,
+    IonCardHeader, IonCardSubtitle, IonCardTitle, IonCardContent,
+    IonList, IonItem, IonInput, CommonModule, FormsModule,
+    RouterLink,
+    IonModal, IonHeader, IonTitle, IonToolbar, IonButtons,
+    IonLabel,
+    IonToggle,
+    IonSearchbar, HeaderComponent
   ]
 })
 export class ProfilePage implements OnInit {
@@ -50,7 +54,8 @@ export class ProfilePage implements OnInit {
     confirmar: ''
   };
 
-  constructor(private toastController: ToastController) {
+  constructor(private navCtrl: NavController,
+              private toastController: ToastController) {
     addIcons({
       personCircle, personOutline, closeOutline, lockClosedOutline, schoolOutline, exitOutline,
       timeOutline, shieldCheckmarkOutline, desktopOutline
@@ -106,5 +111,9 @@ export class ProfilePage implements OnInit {
       position: 'top'
     });
     await toast.present();
+  }
+
+  navegarAdmin() {
+    this.navCtrl.navigateForward('/home-admin');
   }
 }

@@ -1,0 +1,96 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="primary">
+    <ion-title>Panel Admin - Gestión</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="home-wrapper">
+    <div class="content-container">
+
+      <section class="attendance-section">
+        <ion-card class="attendance-hero-card">
+          <div class="attendance-content">
+            <div class="left-column">
+              <div class="user-greeting">
+                <span class="label">Panel de Control</span>
+                <h1 class="user-name">Administración</h1>
+              </div>
+              <div class="time-box">
+                <ion-icon name="people-outline"></ion-icon>
+                <div class="time-text">
+                  <span class="schedule-label">ALUMNOS ACTIVOS</span>
+                  <span class="hours">{{ alumnos.length }} Estudiantes</span>
+                </div>
+              </div>
+            </div>
+            <div class="right-column">
+              <p class="instruction-text">Añade nuevos perfiles al sistema.</p>
+              <ion-button class="fichar-button" (click)="cargarDatosDesdeBD()">
+                <ion-icon name="person-add-outline" slot="start"></ion-icon>
+                NUEVO
+              </ion-button>
+            </div>
+          </div>
+        </ion-card>
+      </section>
+
+      <hr class="divider">
+
+      <section>
+        <h2 class="section-title">Alumnos en el Sistema</h2>
+        <ion-grid>
+          <ion-row>
+            <ion-col size="12" size-sm="6" size-lg="4" size-xl="3" *ngFor="let a of filtroAlumnos">
+              <ion-card class="interactive-card project-card">
+                <div class="image-container" style="background: #f0f2f9; display: flex; align-items: center; justify-content: center;">
+                  <ion-icon name="school-outline" style="font-size: 70px; color: #764ba2;"></ion-icon>
+                  <div class="badge">{{ getModalidadTexto(a.modalidad) }}</div>
+                </div>
+                <ion-card-header>
+                  <ion-card-title>Usuario ID: {{ a.usuarioId }}</ion-card-title>
+                </ion-card-header>
+                <div class="card-footer">
+                  <ion-button fill="outline" class="action-button">
+                    Gestionar Alumno
+                  </ion-button>
+                </div>
+              </ion-card>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </section>
+
+      <hr class="divider">
+
+      <section class="new-projects">
+        <div class="section-header">
+          <h2 class="section-title">Proyectos en Curso</h2>
+          <p class="section-subtitle">Supervisión de estados y entregas.</p>
+        </div>
+
+        <ion-grid>
+          <ion-row>
+            <ion-col size="12" size-md="6" *ngFor="let p of proyectos">
+              <ion-card class="interactive-card new-project-card">
+                <ion-card-header>
+                  <div class="cat-label">{{ p.categoria }}</div>
+                  <ion-card-title>{{ p.titulo }}</ion-card-title>
+                </ion-card-header>
+                <ion-card-content>
+                  <div class="status-section">
+                    <div class="progress-header">
+                      <span class="progress-percent">{{ p.progreso }}% completado</span>
+                    </div>
+                    <ion-progress-bar [value]="p.progreso / 100" color="success"></ion-progress-bar>
+                  </div>
+                </ion-card-content>
+              </ion-card>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </section>
+
+    </div>
+  </div>
+</ion-content>
