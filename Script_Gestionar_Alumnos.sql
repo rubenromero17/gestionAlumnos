@@ -14,7 +14,7 @@ CREATE TABLE usuario (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre_usuario VARCHAR(50) NOT NULL UNIQUE,
     contrasena_hash VARCHAR(255) NOT NULL,
-    rol VARCHAR(20) NOT NULL CHECK (rol IN ('ALUMNO', 'ADMIN')),
+    rol VARCHAR(20) NOT NULL CHECK (rol IN ('alumno', 'administrador')),
     nombre_real VARCHAR(100) NOT NULL
 );
 
