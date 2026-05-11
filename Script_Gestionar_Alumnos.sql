@@ -62,6 +62,7 @@ CREATE TABLE asignacion (
 -- =========================================
 -- 6. TRIGGER CUPOS PROYECTOS
 -- =========================================
+DROP TRIGGER IF EXISTS evitar_exceso_cupo;
 DELIMITER //
 CREATE TRIGGER evitar_exceso_cupo
 BEFORE INSERT ON asignacion
@@ -120,11 +121,11 @@ CREATE TABLE asistencia (
 INSERT INTO modalidad (nombre) VALUES ('Presencial'), ('Online'), ('Semipresencial');
 
 INSERT INTO usuario (nombre_usuario, contrasena_hash, rol, nombre_real) VALUES 
-('admin_jose',   'hash_secure_123', 'ADMIN',  'José Rodríguez'),
-('maria_garcia', 'hash_student_99', 'ALUMNO', 'María García'),
-('carlos_ruiz',  'hash_student_88', 'ALUMNO', 'Carlos Ruiz'),
-('ana_perez',    'hash_student_77', 'ALUMNO', 'Ana Pérez'),
-('luis_mendoza', 'hash_student_66', 'ALUMNO', 'Luis Mendoza');
+('admin_jose',   'hash_secure_123', 'administrador', 'José Rodríguez'),
+('maria_garcia', 'hash_student_99', 'alumno',        'María García'),
+('carlos_ruiz',  'hash_student_88', 'alumno',        'Carlos Ruiz'),
+('ana_perez',    'hash_student_77', 'alumno',        'Ana Pérez'),
+('luis_mendoza', 'hash_student_66', 'alumno',        'Luis Mendoza');
 
 INSERT INTO alumno (usuario_id, modalidad_id) VALUES (2, 1), (3, 2), (4, 1), (5, 3);
 

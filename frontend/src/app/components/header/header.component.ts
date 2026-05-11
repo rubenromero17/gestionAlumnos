@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { IonButtons, IonHeader, IonIcon, IonSearchbar, IonToolbar } from "@ionic/angular/standalone";
 import { RouterLink } from "@angular/router";
+import { CommonModule } from '@angular/common';
 import { addIcons } from "ionicons";
 import { arrowBackOutline, personCircle } from "ionicons/icons";
 
@@ -15,22 +16,31 @@ import { arrowBackOutline, personCircle } from "ionicons/icons";
     IonIcon,
     IonSearchbar,
     IonToolbar,
-    RouterLink
+    RouterLink,
+    CommonModule
   ]
 })
 export class HeaderComponent implements OnInit {
   @Input() mostrarFlecha: boolean = true;
 
-  // Emisor para notificar a la HomePage cuando el usuario escribe
   @Output() search = new EventEmitter<string>();
+
+  fotoUrl: string | null = null;
+  nombreUsuario: string = 'Usuario Pro';
 
   constructor() {
     addIcons({ arrowBackOutline, personCircle });
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.fotoUrl = localStorage.getItem('profile_foto');
+    const savedData = localStorage.getItem('profile_data');
+    if (savedData) {
+      const data = JSON.parse(savedData);
+      if (data.nombre_real) this.nombreUsuario = data.nombre_real;
+    }
+  }
 
-  // Captura el evento del searchbar y emite el valor
   onSearch(event: any) {
     const searchTerm = event.detail.value || '';
     this.search.emit(searchTerm);

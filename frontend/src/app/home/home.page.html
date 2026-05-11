@@ -7,27 +7,37 @@
       @if (mostrarTarjetaAsistencia) {
         <section class="attendance-section" [class.exit-animation]="isExiting">
           <ion-card class="attendance-hero-card">
-            <div class="hero-overlay"></div>
+            <div class="hero-bg-shapes">
+              <div class="shape shape-1"></div>
+              <div class="shape shape-2"></div>
+              <div class="shape shape-3"></div>
+            </div>
             <div class="attendance-content">
               <div class="left-column">
                 <div class="user-greeting">
-                  <span class="label">Hola de nuevo,</span>
+                  <span class="greeting-label">Hola de nuevo,</span>
                   <h1 class="user-name">{{ nombreUsuario }}</h1>
+                  <span class="greeting-sub">Que tengas un excelente dia de trabajo 🚀</span>
                 </div>
                 <div class="time-box">
-                  <ion-icon name="time-outline"></ion-icon>
+                  <div class="time-icon-wrap">
+                    <ion-icon name="time-outline"></ion-icon>
+                  </div>
                   <div class="time-text">
                     <span class="schedule-label">HORARIO DE HOY</span>
-                    <span class="hours">08:00 - 15:00</span>
+                    <span class="hours">08:00 — 15:00</span>
                   </div>
                 </div>
               </div>
               <div class="right-column">
-                <p class="instruction-text">Haz clic para registrar tu entrada hoy.</p>
-                <ion-button class="fichar-button" (click)="fichar()">
-                  <ion-icon name="log-in-outline" slot="start"></ion-icon>
-                  FICHAR
-                </ion-button>
+                <div class="fichar-card">
+                  <p class="instruction-text">Registra tu asistencia</p>
+                  <ion-button class="fichar-button" (click)="fichar()">
+                    <ion-icon name="log-in-outline" slot="start"></ion-icon>
+                    FICHAR ENTRADA
+                  </ion-button>
+                  <span class="fichar-hint">Haz clic para registrar tu entrada de hoy</span>
+                </div>
               </div>
             </div>
           </ion-card>
@@ -45,13 +55,26 @@
               <ion-card class="interactive-card project-card">
                 <div class="image-container">
                   <img [src]="p.imagen" alt="Proyecto"/>
+                  <div class="card-overlay"></div>
                   <div class="badge">{{ p.categoria }}</div>
+                  <div class="progress-chip">{{ p.progreso }}%</div>
                 </div>
-                <ion-card-header>
-                  <ion-card-title>{{ p.titulo }}</ion-card-title>
+                <ion-card-header class="card-header-content">
+                  <ion-card-title class="project-title">{{ p.titulo }}</ion-card-title>
+                  <p class="project-description">{{ p.descripcion }}</p>
                 </ion-card-header>
+                <ion-card-content class="card-body">
+                  <div class="progress-row">
+                    <span class="progress-label">Avance</span>
+                    <span class="progress-value">{{ p.progreso }}%</span>
+                  </div>
+                  <div class="progress-track">
+                    <div class="progress-fill" [style.width.%]="p.progreso"></div>
+                  </div>
+                </ion-card-content>
                 <div class="card-footer">
-                  <ion-button fill="outline" class="action-button" (click)="verDetalles(p, true)">
+                  <ion-button fill="solid" class="action-button" (click)="verDetalles(p, true)">
+                    <ion-icon name="eye-outline" slot="start"></ion-icon>
                     Ver Detalles
                   </ion-button>
                 </div>

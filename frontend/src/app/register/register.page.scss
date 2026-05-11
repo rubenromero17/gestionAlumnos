@@ -31,12 +31,44 @@
   }
 }
 
+.inputs-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 5px;
+}
+
 .custom-input {
-  --background: #fdfdfd;
-  margin-bottom: 12px;
-  border: 1px solid #e0e0e0;
-  border-radius: 12px;
-  --padding-start: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  .input-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #764ba2;
+    letter-spacing: 0.3px;
+    padding-left: 4px;
+  }
+
+  ion-input.styled-input {
+    --background: #f4f0fa;
+    --color: #2d1f3d;
+    --placeholder-color: #b09cc8;
+    --padding-start: 14px;
+    --padding-end: 14px;
+    --border-radius: 12px;
+    border: 1.5px solid #e0d6f0;
+    border-radius: 12px;
+    font-size: 0.97rem;
+    height: 46px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+    &:focus-within {
+      border-color: #764ba2;
+      box-shadow: 0 0 0 3px rgba(118, 75, 162, 0.12);
+    }
+  }
 }
 
 .register-button {

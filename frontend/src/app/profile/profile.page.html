@@ -14,9 +14,11 @@
             <ion-card class="interactive-card profile-main-card">
               <div class="profile-header-bg"></div>
               <div class="profile-avatar-container">
-                <div class="avatar-big">
-                  <ion-icon name="person-outline"></ion-icon>
+                <div class="avatar-big" (click)="fileInput.click()" style="cursor:pointer">
+                  <img *ngIf="fotoUrl" [src]="fotoUrl" class="avatar-img" />
+                  <ion-icon *ngIf="!fotoUrl" name="person-outline"></ion-icon>
                 </div>
+                <input #fileInput type="file" accept="image/*" style="display:none" (change)="onFotoSeleccionada($event)" />
               </div>
               <ion-card-header class="ion-text-center">
                 <ion-card-title>{{ userData.nombre_real }}</ion-card-title>
@@ -35,7 +37,7 @@
                     <span class="stat-label">{{ userData.modalidad }}</span>
                   </div>
                 </div>
-                <ion-button expand="block" fill="outline" class="action-button">
+                <ion-button expand="block" fill="outline" class="action-button" (click)="fileInput.click()">
                   Editar Foto
                 </ion-button>
               </ion-card-content>

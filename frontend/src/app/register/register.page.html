@@ -7,23 +7,24 @@
           <ion-col size="12" size-md="7">
             <div class="form-section">
               <ion-card-title>CREAR CUENTA</ion-card-title>
-              <ion-list lines="none">
-                <ion-item class="custom-input">
-                  <ion-input label="Nombre Completo" labelPlacement="stacked" type="text" placeholder="Juan Pérez"></ion-input>
-                </ion-item>
-
-                <ion-item class="custom-input">
-                  <ion-input label="Email" labelPlacement="stacked" type="email" placeholder="ejemplo@correo.com"></ion-input>
-                </ion-item>
-
-                <ion-item class="custom-input">
-                  <ion-input label="Contraseña" labelPlacement="stacked" type="password" placeholder="********"></ion-input>
-                </ion-item>
-
-                <ion-item class="custom-input">
-                  <ion-input label="Confirmar Contraseña" labelPlacement="stacked" type="password" placeholder="********"></ion-input>
-                </ion-item>
-              </ion-list>
+              <div class="inputs-wrapper">
+                <div class="custom-input">
+                  <label class="input-label">Nombre Completo</label>
+                  <ion-input type="text" placeholder="Juan Pérez" class="styled-input"></ion-input>
+                </div>
+                <div class="custom-input">
+                  <label class="input-label">Email</label>
+                  <ion-input type="email" placeholder="ejemplo@correo.com" class="styled-input"></ion-input>
+                </div>
+                <div class="custom-input">
+                  <label class="input-label">Contraseña</label>
+                  <ion-input type="password" placeholder="********" class="styled-input"></ion-input>
+                </div>
+                <div class="custom-input">
+                  <label class="input-label">Confirmar Contraseña</label>
+                  <ion-input type="password" placeholder="********" class="styled-input"></ion-input>
+                </div>
+              </div>
 
               <ion-button expand="block" class="register-button" [routerLink]="['/home']">
                 Registrarse

@@ -34,6 +34,7 @@ import { HeaderComponent } from "../components/header/header.component";
 })
 export class ProfilePage implements OnInit {
   isPasswordModalOpen = false;
+  fotoUrl: string | null = null;
 
   userData = {
     nombre_real: 'Usuario Pro',
@@ -62,7 +63,25 @@ export class ProfilePage implements OnInit {
     });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    const savedFoto = localStorage.getItem('profile_foto');
+    if (savedFoto) this.fotoUrl = savedFoto;
+
+    const savedData = localStorage.getItem('profile_data');
+    if (savedData) this.userData = JSON.parse(savedData);
+  }
+
+  onFotoSeleccionada(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.fotoUrl = e.target?.result as string;
+        localStorage.setItem('profile_foto', this.fotoUrl!);
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
 
   abrirModalPassword() {
     this.isPasswordModalOpen = true;
@@ -70,7 +89,8 @@ export class ProfilePage implements OnInit {
 
   // NUEVA FUNCIÓN PARA EL BOTÓN DE GUARDAR CAMBIOS
   async guardarCambios() {
-    // Aquí puedes añadir en el futuro la lógica para llamar a tu base de datos/API
+    localStorage.setItem('profile_data', JSON.stringify(this.userData));
+    if (this.fotoUrl) localStorage.setItem('profile_foto', this.fotoUrl);
     console.log('Nuevos datos del usuario:', this.userData);
     await this.presentToast('Cambios guardados correctamente', 'success');
   }
