@@ -15,27 +15,27 @@ public class UsuarioController {
     @Autowired
     private UsuarioService usuarioService;
 
-    @PostMapping
+    @PostMapping("/crear")
     public UsuarioDTO crearUsuario(@RequestBody UsuarioDTO usuarioDTO) {
         return usuarioService.crearUsuario(usuarioDTO);
     }
 
-    @GetMapping
+    @GetMapping("/listar")
     public List<UsuarioDTO> listarUsuario() {
         return usuarioService.obtenerTodosLosUsuarios();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/buscar/{id}")
     public UsuarioDTO buscarPorId(@PathVariable Long id) {
         return usuarioService.buscarUsuarioPorId(id);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/editar/{id}")
     public UsuarioDTO editarUsuario(@PathVariable Long id, @RequestBody UsuarioDTO usuarioDTO) {
         return usuarioService.actualizarUsuario(id, usuarioDTO);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/eliminar/{id}")
     public ResponseEntity<Void> eliminarUsuario(@PathVariable Long id) {
         usuarioService.eliminarUsuario(id);
         return ResponseEntity.noContent().build();

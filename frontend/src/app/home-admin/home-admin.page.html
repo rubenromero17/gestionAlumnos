@@ -37,28 +37,94 @@
 
       <hr class="divider">
 
+      <!-- SECCIÓN USUARIOS -->
       <section>
-        <h2 class="section-title">Alumnos en el Sistema</h2>
-        <ion-grid>
-          <ion-row>
-            <ion-col size="12" size-sm="6" size-lg="4" size-xl="3" *ngFor="let a of filtroAlumnos">
-              <ion-card class="interactive-card project-card">
-                <div class="image-container" style="background: #f0f2f9; display: flex; align-items: center; justify-content: center;">
-                  <ion-icon name="school-outline" style="font-size: 70px; color: #764ba2;"></ion-icon>
-                  <div class="badge">{{ getModalidadTexto(a.modalidad) }}</div>
-                </div>
-                <ion-card-header>
-                  <ion-card-title>Usuario ID: {{ a.usuarioId }}</ion-card-title>
-                </ion-card-header>
-                <div class="card-footer">
-                  <ion-button fill="outline" class="action-button">
-                    Gestionar Alumno
-                  </ion-button>
-                </div>
-              </ion-card>
-            </ion-col>
-          </ion-row>
-        </ion-grid>
+        <div class="usuarios-header">
+          <div class="usuarios-title-block">
+            <h2 class="section-title" style="margin: 0;">Usuarios del Sistema</h2>
+            <span class="usuarios-count">{{ filtroUsuarios.length }} usuario{{ filtroUsuarios.length !== 1 ? 's' : '' }}</span>
+          </div>
+
+          <div class="usuarios-controles">
+            <ion-searchbar
+              placeholder="Buscar por nombre o ID..."
+              (ionInput)="buscarUsuario($event)"
+              style="max-width: 320px; --border-radius: 12px;">
+            </ion-searchbar>
+
+            <div class="filtro-roles">
+              <button
+                class="filtro-btn"
+                [class.active]="filtroRol === ''"
+                (click)="filtrarPorRol('')">
+                Todos
+              </button>
+              <button
+                class="filtro-btn filtro-admin"
+                [class.active]="filtroRol === 'ADMIN'"
+                (click)="filtrarPorRol('ADMIN')">
+                Admin
+              </button>
+              <button
+                class="filtro-btn filtro-alumno"
+                [class.active]="filtroRol === 'ALUMNO'"
+                (click)="filtrarPorRol('ALUMNO')">
+                Alumno
+              </button>
+              <button
+                class="filtro-btn filtro-profesor"
+                [class.active]="filtroRol === 'PROFESOR'"
+                (click)="filtrarPorRol('PROFESOR')">
+                Profesor
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- LISTA DE USUARIOS -->
+        <div class="usuarios-lista" *ngIf="!loadingUsuarios">
+
+          <div class="usuario-item" *ngFor="let u of filtroUsuarios">
+            <div class="usuario-avatar" [ngClass]="'avatar-' + u.rol?.toLowerCase()">
+              <ion-icon [name]="getIconoPorRol(u.rol)"></ion-icon>
+            </div>
+            <div class="usuario-info">
+              <span class="usuario-nombre">{{ u.nombreReal }}</span>
+              <span class="usuario-id">ID: {{ u.id }}</span>
+            </div>
+            <div class="usuario-rol-badge" [ngClass]="'rol-' + u.rol?.toLowerCase()">
+              {{ u.rol }}
+            </div>
+            <div class="usuario-acciones">
+              <ion-button fill="clear" size="small" class="accion-btn edit-btn">
+                <ion-icon name="pencil-outline" slot="icon-only"></ion-icon>
+              </ion-button>
+              <ion-button fill="clear" size="small" class="accion-btn delete-btn" (click)="eliminarUsuario(u.id)">
+                <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+              </ion-button>
+            </div>
+          </div>
+
+          <!-- ESTADO VACÍO -->
+          <div class="usuarios-vacio" *ngIf="filtroUsuarios.length === 0">
+            <ion-icon name="search-outline"></ion-icon>
+            <p>No se encontraron usuarios con ese criterio.</p>
+          </div>
+
+        </div>
+
+        <!-- SKELETON LOADING -->
+        <div class="usuarios-lista" *ngIf="loadingUsuarios">
+          <div class="usuario-item skeleton" *ngFor="let i of [1,2,3,4,5]">
+            <div class="usuario-avatar skeleton-box"></div>
+            <div class="usuario-info">
+              <span class="skeleton-line wide"></span>
+              <span class="skeleton-line short"></span>
+            </div>
+            <div class="skeleton-line medium"></div>
+          </div>
+        </div>
+
       </section>
 
       <hr class="divider">
@@ -68,7 +134,6 @@
           <h2 class="section-title">Proyectos en Curso</h2>
           <p class="section-subtitle">Supervisión de estados y entregas.</p>
         </div>
-
         <ion-grid>
           <ion-row>
             <ion-col size="12" size-md="6" *ngFor="let p of proyectos">

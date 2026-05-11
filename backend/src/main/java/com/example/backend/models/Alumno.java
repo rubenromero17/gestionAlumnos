@@ -14,20 +14,20 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity
 @Table(name="alumno")
-
 public class Alumno {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "usuario_id", unique = true)
+    @JoinColumn(name = "usuario_id", unique = true, foreignKey = @ForeignKey(name = "fk_alumno_usuario"))
     private Usuario usuario;
 
     @ManyToOne
     @JoinColumn(name = "modalidad_id")
     private Modalidad modalidad;
 
-    @OneToMany(mappedBy = "alumno")
+    @OneToMany(mappedBy = "alumno", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Asignacion> asignacion = new HashSet<>();
 }

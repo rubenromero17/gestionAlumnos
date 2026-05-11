@@ -2,7 +2,7 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- Borrado de tablas previas para ejecución limpia
-DROP TABLE IF EXISTS asistencia, horario, comentario, asignacione, proyecto, alumno, modalidad, usuario;
+DROP TABLE IF EXISTS asistencia, horario, comentario, asignacion, proyecto, alumno, modalidad, usuario;
 
 -- Activar revisión de llaves foráneas
 SET FOREIGN_KEY_CHECKS = 1;
@@ -14,7 +14,7 @@ CREATE TABLE usuario (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre_usuario VARCHAR(50) NOT NULL UNIQUE,
     contrasena_hash VARCHAR(255) NOT NULL,
-    rol VARCHAR(20) NOT NULL CHECK (rol IN ('alumno', 'administrador')),
+    rol VARCHAR(20) NOT NULL CHECK (rol IN ('ALUMNO', 'ADMIN')),
     nombre_real VARCHAR(100) NOT NULL
 );
 
@@ -33,7 +33,7 @@ CREATE TABLE alumno (
     id INT AUTO_INCREMENT PRIMARY KEY,
     usuario_id INT UNIQUE,
     modalidad_id INT,
-    FOREIGN KEY (usuario_id) REFERENCES usuario(id),
+    FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE,
     FOREIGN KEY (modalidad_id) REFERENCES modalidad(id)
 );
 
@@ -55,8 +55,8 @@ CREATE TABLE asignacion (
     alumno_id INT,
     proyecto_id INT,
     PRIMARY KEY (alumno_id, proyecto_id),
-    FOREIGN KEY (alumno_id) REFERENCES alumno(id),
-    FOREIGN KEY (proyecto_id) REFERENCES proyecto(id)
+    FOREIGN KEY (alumno_id) REFERENCES alumno(id) ON DELETE CASCADE,
+    FOREIGN KEY (proyecto_id) REFERENCES proyecto(id) ON DELETE CASCADE
 );
 
 -- =========================================
@@ -86,8 +86,8 @@ CREATE TABLE comentario (
     usuario_id INT,
     texto VARCHAR(500) NOT NULL,
     fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (proyecto_id) REFERENCES proyecto(id),
-    FOREIGN KEY (usuario_id) REFERENCES usuario(id)
+    FOREIGN KEY (proyecto_id) REFERENCES proyecto(id) ON DELETE CASCADE,
+    FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
 );
 
 -- =========================================
@@ -99,7 +99,7 @@ CREATE TABLE horario (
     dia_semana VARCHAR(20) NOT NULL,
     hora_inicio VARCHAR(10) NOT NULL,
     hora_fin VARCHAR(10) NOT NULL,
-    FOREIGN KEY (alumno_id) REFERENCES alumno(id)
+    FOREIGN KEY (alumno_id) REFERENCES alumno(id) ON DELETE CASCADE
 );
 
 -- =========================================
@@ -110,7 +110,7 @@ CREATE TABLE asistencia (
     alumno_id INT,
     fecha DATE DEFAULT (CURRENT_DATE),
     presente TINYINT(1) DEFAULT 0,
-    FOREIGN KEY (alumno_id) REFERENCES alumno(id)
+    FOREIGN KEY (alumno_id) REFERENCES alumno(id) ON DELETE CASCADE
 );
 
 -- =========================================
@@ -120,21 +120,19 @@ CREATE TABLE asistencia (
 INSERT INTO modalidad (nombre) VALUES ('Presencial'), ('Online'), ('Semipresencial');
 
 INSERT INTO usuario (nombre_usuario, contrasena_hash, rol, nombre_real) VALUES 
-('admin_jose', 'hash_secure_123', 'administrador', 'José Rodríguez'),
-('maria_garcia', 'hash_student_99', 'alumno', 'María García'),
-('carlos_ruiz', 'hash_student_88', 'alumno', 'Carlos Ruiz'),
-('ana_perez', 'hash_student_77', 'alumno', 'Ana Pérez'),
-('luis_mendoza', 'hash_student_66', 'alumno', 'Luis Mendoza');
+('admin_jose',   'hash_secure_123', 'ADMIN',  'José Rodríguez'),
+('maria_garcia', 'hash_student_99', 'ALUMNO', 'María García'),
+('carlos_ruiz',  'hash_student_88', 'ALUMNO', 'Carlos Ruiz'),
+('ana_perez',    'hash_student_77', 'ALUMNO', 'Ana Pérez'),
+('luis_mendoza', 'hash_student_66', 'ALUMNO', 'Luis Mendoza');
 
--- Alumnos (IDs 2 al 5 de usuarios son alumnos)
 INSERT INTO alumno (usuario_id, modalidad_id) VALUES (2, 1), (3, 2), (4, 1), (5, 3);
 
 INSERT INTO proyecto (titulo, descripcion, cupo_maximo, estado) VALUES 
-('Sistema de Gestión IA', 'Desarrollo de un core basado en redes neuronales', 3, 'en curso'),
-('App Móvil Reciclaje', 'Aplicación para incentivar el reciclaje urbano', 5, 'en curso'),
-('Portal E-learning', 'Plataforma educativa para zonas rurales', 10, 'finalizado');
+('Sistema de Gestión IA', 'Desarrollo de un core basado en redes neuronales', 3,  'en curso'),
+('App Móvil Reciclaje',   'Aplicación para incentivar el reciclaje urbano',    5,  'en curso'),
+('Portal E-learning',     'Plataforma educativa para zonas rurales',           10, 'finalizado');
 
--- Asignaciones (IDs de alumnos 1, 2, 3, 4 recién creados)
 INSERT INTO asignacion (alumno_id, proyecto_id) VALUES (1, 1), (2, 1), (3, 2), (4, 2);
 
 INSERT INTO comentario (proyecto_id, usuario_id, texto) VALUES 
@@ -143,7 +141,7 @@ INSERT INTO comentario (proyecto_id, usuario_id, texto) VALUES
 (2, 1, 'Excelente progreso con el diseño de la interfaz.');
 
 INSERT INTO horario (alumno_id, dia_semana, hora_inicio, hora_fin) VALUES 
-(1, 'Lunes', '09:00', '13:00'),
+(1, 'Lunes',  '09:00', '13:00'),
 (2, 'Martes', '15:00', '19:00');
 
 INSERT INTO asistencia (alumno_id, fecha, presente) VALUES 
