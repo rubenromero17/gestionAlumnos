@@ -1,8 +1,4 @@
-<ion-header class="ion-no-border">
-  <ion-toolbar color="primary">
-    <ion-title>Panel Admin - Gestión</ion-title>
-  </ion-toolbar>
-</ion-header>
+<app-header [mostrarFlecha]="true"></app-header>
 
 <ion-content [fullscreen]="true">
   <div class="home-wrapper">
@@ -61,22 +57,17 @@
               </button>
               <button
                 class="filtro-btn filtro-admin"
-                [class.active]="filtroRol === 'ADMIN'"
-                (click)="filtrarPorRol('ADMIN')">
+                [class.active]="filtroRol === 'administrador'"
+                (click)="filtrarPorRol('administrador')">
                 Admin
               </button>
               <button
                 class="filtro-btn filtro-alumno"
-                [class.active]="filtroRol === 'ALUMNO'"
-                (click)="filtrarPorRol('ALUMNO')">
+                [class.active]="filtroRol === 'alumno'"
+                (click)="filtrarPorRol('alumno')">
                 Alumno
               </button>
-              <button
-                class="filtro-btn filtro-profesor"
-                [class.active]="filtroRol === 'PROFESOR'"
-                (click)="filtrarPorRol('PROFESOR')">
-                Profesor
-              </button>
+
             </div>
           </div>
         </div>
@@ -96,7 +87,7 @@
               {{ u.rol }}
             </div>
             <div class="usuario-acciones">
-              <ion-button fill="clear" size="small" class="accion-btn edit-btn">
+              <ion-button fill="clear" size="small" class="accion-btn edit-btn" (click)="abrirModalEdicion(u)">
                 <ion-icon name="pencil-outline" slot="icon-only"></ion-icon>
               </ion-button>
               <ion-button fill="clear" size="small" class="accion-btn delete-btn" (click)="eliminarUsuario(u.id)">
@@ -159,3 +150,74 @@
     </div>
   </div>
 </ion-content>
+
+<!-- MODAL EDICIÓN USUARIO -->
+<div class="modal-overlay" *ngIf="modalEdicionAbierto" (click)="cerrarModalEdicion()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <div class="modal-header-info">
+        <div class="modal-avatar" [ngClass]="'avatar-' + usuarioEditando?.rol?.toLowerCase()">
+          <ion-icon [name]="getIconoPorRol(usuarioEditando?.rol || '')"></ion-icon>
+        </div>
+        <div>
+          <h2 class="modal-title">Editar Usuario</h2>
+          <span class="modal-subtitle">ID: {{ usuarioEditando?.id }}</span>
+        </div>
+      </div>
+      <ion-button fill="clear" class="modal-close-btn" (click)="cerrarModalEdicion()">
+        <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Nombre real</label>
+        <input
+          class="form-input"
+          type="text"
+          [(ngModel)]="formEdicion.nombreReal"
+          placeholder="Nombre completo" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Nombre de usuario</label>
+        <input
+          class="form-input"
+          type="text"
+          [(ngModel)]="formEdicion.nombreUsuario"
+          placeholder="Nombre de usuario" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Rol</label>
+        <select class="form-select" [(ngModel)]="formEdicion.rol">
+          <option value="administrador">Administrador</option>
+          <option value="alumno">Alumno</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">
+          Nueva contraseña
+          <span class="form-hint">(dejar vacío para no cambiar)</span>
+        </label>
+        <input
+          class="form-input"
+          type="password"
+          [(ngModel)]="formEdicion.contrasenaHash"
+          placeholder="••••••••" />
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancelar" (click)="cerrarModalEdicion()">Cancelar</button>
+      <button class="btn-guardar" (click)="guardarEdicion()" [disabled]="guardandoEdicion">
+        <ion-icon name="checkmark-outline" *ngIf="!guardandoEdicion"></ion-icon>
+        <ion-icon name="hourglass-outline" *ngIf="guardandoEdicion"></ion-icon>
+        {{ guardandoEdicion ? 'Guardando...' : 'Guardar cambios' }}
+      </button>
+    </div>
+
+  </div>
+</div>

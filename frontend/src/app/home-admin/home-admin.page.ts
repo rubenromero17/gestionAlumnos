@@ -12,11 +12,13 @@ import {
   peopleOutline, businessOutline, personAddOutline,
   settingsOutline, searchOutline, schoolOutline,
   statsChartOutline, listOutline, pencilOutline, trashOutline,
-  personOutline, shieldCheckmarkOutline, readerOutline
+  personOutline, shieldCheckmarkOutline, readerOutline,
+  closeOutline, checkmarkOutline, hourglassOutline
 } from 'ionicons/icons';
 import { alumno } from '../modelos/alumno';
 import { AlumnoService } from '../services/alumno-service';
 import { UsuarioService, Usuario } from '../services/usuario-service';
+import {HeaderComponent} from "../components/header/header.component";
 
 @Component({
   selector: 'app-home-admin',
@@ -27,7 +29,7 @@ import { UsuarioService, Usuario } from '../services/usuario-service';
     IonContent, IonHeader, IonTitle, IonToolbar, IonButton,
     IonIcon, IonGrid, IonRow, IonCol, IonCard, IonCardHeader,
     IonCardTitle, IonCardContent, CommonModule,
-    FormsModule, IonProgressBar, IonSearchbar, IonCardSubtitle,
+    FormsModule, IonProgressBar, IonSearchbar, IonCardSubtitle, HeaderComponent,
   ]
 })
 export class HomeAdminPage implements OnInit {
@@ -42,6 +44,12 @@ export class HomeAdminPage implements OnInit {
   textoBusqueda: string = '';
   filtroRol: string = '';
 
+  // Modal edición
+  modalEdicionAbierto: boolean = false;
+  usuarioEditando: Usuario | null = null;
+  guardandoEdicion: boolean = false;
+  formEdicion = { nombreReal: '', nombreUsuario: '', rol: '', contrasenaHash: '' };
+
   constructor(
     private alumnoService: AlumnoService,
     private usuarioService: UsuarioService,
@@ -51,7 +59,8 @@ export class HomeAdminPage implements OnInit {
       peopleOutline, businessOutline, personAddOutline,
       settingsOutline, searchOutline, schoolOutline,
       statsChartOutline, listOutline, pencilOutline, trashOutline,
-      personOutline, shieldCheckmarkOutline, readerOutline
+      personOutline, shieldCheckmarkOutline, readerOutline,
+      closeOutline, checkmarkOutline, hourglassOutline
     });
   }
 
@@ -105,7 +114,7 @@ export class HomeAdminPage implements OnInit {
     let resultado = [...this.usuarios];
 
     if (this.filtroRol) {
-      resultado = resultado.filter(u => u.rol === this.filtroRol);
+      resultado = resultado.filter(u => u.rol?.toLowerCase() === this.filtroRol.toLowerCase());
     }
 
     if (this.textoBusqueda.trim()) {
@@ -130,10 +139,10 @@ export class HomeAdminPage implements OnInit {
   }
 
   getIconoPorRol(rol: string): string {
-    switch (rol) {
-      case 'ADMIN':    return 'shield-checkmark-outline';
-      case 'PROFESOR': return 'reader-outline';
-      default:         return 'person-outline';
+    switch (rol?.toLowerCase()) {
+      case 'administrador': return 'shield-checkmark-outline';
+      case 'profesor':      return 'reader-outline';
+      default:              return 'person-outline';
     }
   }
 
@@ -145,6 +154,53 @@ export class HomeAdminPage implements OnInit {
       position: 'top'
     });
     await toast.present();
+  }
+
+  abrirModalEdicion(usuario: Usuario) {
+    this.usuarioEditando = usuario;
+    this.formEdicion = {
+      nombreReal: usuario.nombreReal ?? '',
+      nombreUsuario: (usuario as any).nombreUsuario ?? '',
+      rol: usuario.rol ?? '',
+      contrasenaHash: ''
+    };
+    this.modalEdicionAbierto = true;
+  }
+
+  cerrarModalEdicion() {
+    this.modalEdicionAbierto = false;
+    this.usuarioEditando = null;
+    this.guardandoEdicion = false;
+  }
+
+  guardarEdicion() {
+    if (!this.usuarioEditando) return;
+    this.guardandoEdicion = true;
+
+    const payload: any = {
+      nombreReal: this.formEdicion.nombreReal,
+      nombreUsuario: this.formEdicion.nombreUsuario,
+      rol: this.formEdicion.rol,
+    };
+    if (this.formEdicion.contrasenaHash.trim()) {
+      payload.contrasenaHash = this.formEdicion.contrasenaHash;
+    }
+
+    this.usuarioService.actualizarUsuario(this.usuarioEditando.id, payload).subscribe({
+      next: (actualizado) => {
+        const idx = this.usuarios.findIndex(u => u.id === this.usuarioEditando!.id);
+        if (idx !== -1) {
+          this.usuarios[idx] = { ...this.usuarios[idx], ...actualizado };
+        }
+        this.aplicarFiltros();
+        this.mostrarToast('Usuario actualizado correctamente', 'success');
+        this.cerrarModalEdicion();
+      },
+      error: () => {
+        this.mostrarToast('Error al actualizar el usuario', 'danger');
+        this.guardandoEdicion = false;
+      }
+    });
   }
 
   getModalidadTexto(mod: number): string {
