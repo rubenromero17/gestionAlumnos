@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -74,7 +73,10 @@ public class UsuarioService {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ElementoNoEncontradoException("Usuario no encontrado con id: " + id));
 
-        if (!usuario.getNombreUsuario().equals(usuarioDTO.getNombreUsuario())) {
+        // Solo actualizar nombreUsuario si viene informado y es distinto al actual
+        if (usuarioDTO.getNombreUsuario() != null
+                && !usuarioDTO.getNombreUsuario().isBlank()
+                && !usuarioDTO.getNombreUsuario().equals(usuario.getNombreUsuario())) {
             usuarioRepository.findByNombreUsuario(usuarioDTO.getNombreUsuario()).ifPresent(u -> {
                 throw new ResourceAlreadyExistsException(
                         "Ya existe un usuario con el nombre de usuario: " + usuarioDTO.getNombreUsuario()
@@ -83,7 +85,10 @@ public class UsuarioService {
             usuario.setNombreUsuario(usuarioDTO.getNombreUsuario());
         }
 
-        if (!usuario.getNombreReal().equals(usuarioDTO.getNombreReal())) {
+        // Solo actualizar nombreReal si viene informado y es distinto al actual
+        if (usuarioDTO.getNombreReal() != null
+                && !usuarioDTO.getNombreReal().isBlank()
+                && !usuarioDTO.getNombreReal().equals(usuario.getNombreReal())) {
             usuarioRepository.findByNombreReal(usuarioDTO.getNombreReal()).ifPresent(u -> {
                 throw new ResourceAlreadyExistsException(
                         "Ya existe un usuario con el nombre real: " + usuarioDTO.getNombreReal()
@@ -92,8 +97,12 @@ public class UsuarioService {
             usuario.setNombreReal(usuarioDTO.getNombreReal());
         }
 
-        usuario.setRol(usuarioDTO.getRol());
+        // Solo actualizar rol si viene informado
+        if (usuarioDTO.getRol() != null) {
+            usuario.setRol(usuarioDTO.getRol());
+        }
 
+        // Solo actualizar contraseña si viene informada
         if (usuarioDTO.getContrasenaHash() != null && !usuarioDTO.getContrasenaHash().isBlank()) {
             usuario.setContrasenaHash(passwordEncoder.encode(usuarioDTO.getContrasenaHash()));
         }
@@ -107,12 +116,8 @@ public class UsuarioService {
             throw new ElementoNoEncontradoException("Usuario no encontrado con id: " + id);
         }
 
-        // Eliminar comentarios del usuario para evitar fallo de foreign key
         comentarioRepository.deleteAll(comentarioRepository.findByUsuarioId(id));
-
-        // Eliminar el alumno asociado si existe, para evitar el fallo de foreign key
         alumnoRepository.findByUsuarioId(id).ifPresent(alumnoRepository::delete);
-
         usuarioRepository.deleteById(id);
     }
 }

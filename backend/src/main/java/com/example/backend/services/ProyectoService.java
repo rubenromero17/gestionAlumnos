@@ -2,6 +2,7 @@ package com.example.backend.services;
 
 import com.example.backend.dto.ProyectoDTO;
 import com.example.backend.mapper.ProyectoMapper;
+import com.example.backend.models.Proyecto;
 import com.example.backend.repositories.ProyectoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,8 @@ public class ProyectoService {
 
     @Autowired
     private ProyectoMapper proyectoMapper;
+
+    // ─── READ ────────────────────────────────────────────────────────────────
 
     public List<ProyectoDTO> findAll() {
         return proyectoRepository.findAll().stream()
@@ -50,5 +53,35 @@ public class ProyectoService {
         return proyectoRepository
                 .findByAsignaciones_AlumnoIdNotContaining(alumnoId)
                 .stream().map(proyectoMapper::toDTO).collect(Collectors.toList());
+    }
+
+    // ─── CREATE ──────────────────────────────────────────────────────────────
+
+    public ProyectoDTO create(ProyectoDTO dto) {
+        Proyecto proyecto = proyectoMapper.toEntity(dto);
+        Proyecto guardado = proyectoRepository.save(proyecto);
+        return proyectoMapper.toDTO(guardado);
+    }
+
+    // ─── UPDATE ──────────────────────────────────────────────────────────────
+
+    public Optional<ProyectoDTO> update(Long id, ProyectoDTO dto) {
+        return proyectoRepository.findById(id).map(existing -> {
+            existing.setTitulo(dto.getTitulo());
+            existing.setDescripcion(dto.getDescripcion());
+            existing.setCupoMaximo(dto.getCupoMaximo());
+            existing.setEstado(dto.getEstado());
+            return proyectoMapper.toDTO(proyectoRepository.save(existing));
+        });
+    }
+
+    // ─── DELETE ──────────────────────────────────────────────────────────────
+
+    public boolean delete(Long id) {
+        if (!proyectoRepository.existsById(id)) {
+            return false;
+        }
+        proyectoRepository.deleteById(id);
+        return true;
     }
 }

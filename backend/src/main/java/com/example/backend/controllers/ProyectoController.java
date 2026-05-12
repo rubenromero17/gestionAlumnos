@@ -3,10 +3,9 @@ package com.example.backend.controllers;
 import com.example.backend.dto.ProyectoDTO;
 import com.example.backend.services.ProyectoService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,14 +17,18 @@ public class ProyectoController {
     @Autowired
     private ProyectoService proyectoService;
 
+    // ─── READ ────────────────────────────────────────────────────────────────
+
     @GetMapping
     public List<ProyectoDTO> findAll() {
         return proyectoService.findAll();
     }
 
     @GetMapping("/{id}")
-    public Optional<ProyectoDTO> findById(@PathVariable Long id) {
-        return proyectoService.findById(id);
+    public ResponseEntity<ProyectoDTO> findById(@PathVariable Long id) {
+        return proyectoService.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     // Proyectos en curso o pausados donde el alumno está inscrito
@@ -44,5 +47,32 @@ public class ProyectoController {
     @GetMapping("/alumno/{alumnoId}/explorar")
     public List<ProyectoDTO> findNoInscritosByAlumno(@PathVariable Long alumnoId) {
         return proyectoService.findNoInscritosByAlumno(alumnoId);
+    }
+
+    // ─── CREATE ──────────────────────────────────────────────────────────────
+
+    @PostMapping
+    public ResponseEntity<ProyectoDTO> create(@RequestBody ProyectoDTO dto) {
+        ProyectoDTO creado = proyectoService.create(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(creado);
+    }
+
+    // ─── UPDATE ──────────────────────────────────────────────────────────────
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ProyectoDTO> update(@PathVariable Long id, @RequestBody ProyectoDTO dto) {
+        return proyectoService.update(id, dto)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    // ─── DELETE ──────────────────────────────────────────────────────────────
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        if (proyectoService.delete(id)) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 }
