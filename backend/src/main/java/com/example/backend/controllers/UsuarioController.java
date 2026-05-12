@@ -5,6 +5,7 @@ import com.example.backend.services.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.example.backend.dto.LoginRequest;
 
 import java.util.List;
 
@@ -39,5 +40,11 @@ public class UsuarioController {
     public ResponseEntity<Void> eliminarUsuario(@PathVariable Long id) {
         usuarioService.eliminarUsuario(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<UsuarioDTO> login(@RequestBody LoginRequest loginRequest) {
+        UsuarioDTO usuario = usuarioService.login(loginRequest);
+        return ResponseEntity.ok(usuario);
     }
 }

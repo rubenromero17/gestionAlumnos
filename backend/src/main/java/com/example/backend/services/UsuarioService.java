@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.example.backend.dto.LoginRequest;
 
 import java.util.List;
 
@@ -119,5 +120,15 @@ public class UsuarioService {
         comentarioRepository.deleteAll(comentarioRepository.findByUsuarioId(id));
         alumnoRepository.findByUsuarioId(id).ifPresent(alumnoRepository::delete);
         usuarioRepository.deleteById(id);
+    }
+    public UsuarioDTO login(LoginRequest request) {
+        Usuario usuario = usuarioRepository.findByNombreUsuario(request.getNombreUsuario())
+                .orElseThrow(() -> new ElementoNoEncontradoException("Usuario no encontrado"));
+
+        if (!passwordEncoder.matches(request.getContrasena(), usuario.getContrasenaHash())) {
+            throw new ElementoNoEncontradoException("Contraseña incorrecta");
+        }
+
+        return usuarioMapper.toDTO(usuario);
     }
 }
