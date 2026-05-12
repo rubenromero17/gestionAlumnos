@@ -1,3 +1,7 @@
+CREATE DATABASE IF NOT EXISTS gestion_alumnos;
+
+USE gestion_alumnos;
+
 -- Desactivar revisión de llaves foráneas temporalmente para limpieza
 SET FOREIGN_KEY_CHECKS = 0;
 
@@ -15,7 +19,8 @@ CREATE TABLE usuario (
     nombre_usuario VARCHAR(50) NOT NULL UNIQUE,
     contrasena_hash VARCHAR(255) NOT NULL,
     rol VARCHAR(20) NOT NULL CHECK (rol IN ('alumno', 'administrador')),
-    nombre_real VARCHAR(100) NOT NULL
+    nombre_real VARCHAR(100) NOT NULL,
+    foto_usuario VARCHAR(255) DEFAULT NULL
 );
 
 -- =========================================
@@ -45,7 +50,8 @@ CREATE TABLE proyecto (
     titulo VARCHAR(100) NOT NULL,
     descripcion VARCHAR(500),
     cupo_maximo INT DEFAULT 5 NOT NULL,
-    estado VARCHAR(20) DEFAULT 'en curso' CHECK (estado IN ('en curso', 'finalizado', 'pausado'))
+    estado VARCHAR(20) DEFAULT 'en curso' CHECK (estado IN ('en curso', 'finalizado', 'pausado')),
+    foto_proyecto VARCHAR(255) DEFAULT NULL
 );
 
 -- =========================================
