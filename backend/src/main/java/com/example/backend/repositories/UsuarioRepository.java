@@ -1,4 +1,3 @@
-// UsuarioRepository.java
 package com.example.backend.repositories;
 
 import com.example.backend.models.Usuario;
@@ -9,6 +8,8 @@ import java.util.Optional;
 
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
+
+    Optional<Usuario> findByNombreUsuario(String nombreUsuario);
+
     Optional<Usuario> findByNombreReal(String nombreReal);
-    boolean existsByNombreReal(String nombreReal);
 }

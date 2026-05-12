@@ -7,14 +7,16 @@
           <ion-col size="12" size-md="7">
             <div class="form-section">
               <ion-card-title>BIENVENIDO</ion-card-title>
-              <ion-list lines="none">
-                <ion-item class="custom-input">
-                  <ion-input label="Email" labelPlacement="stacked" type="email" placeholder="ejemplo@correo.com"></ion-input>
-                </ion-item>
-                <ion-item class="custom-input">
-                  <ion-input label="Password" labelPlacement="stacked" type="password" placeholder="********"></ion-input>
-                </ion-item>
-              </ion-list>
+              <div class="inputs-wrapper">
+                <div class="custom-input">
+                  <label class="input-label">Email</label>
+                  <ion-input type="email" placeholder="ejemplo@correo.com" class="styled-input"></ion-input>
+                </div>
+                <div class="custom-input">
+                  <label class="input-label">Password</label>
+                  <ion-input type="password" placeholder="********" class="styled-input"></ion-input>
+                </div>
+              </div>
               <ion-button expand="block" class="login-button" [routerLink]="['/home']">
                 Iniciar Sesión
               </ion-button>

@@ -21,10 +21,11 @@
         <div class="user-card-trigger" [routerLink]="['/profile']">
           <div class="user-info-text">
             <span class="welcome-msg">Bienvenido,</span>
-            <span class="user-name">Usuario Pro</span>
+            <span class="user-name">{{ nombreUsuario }}</span>
           </div>
           <div class="avatar-wrapper">
-            <ion-icon name="person-circle"></ion-icon>
+            <img *ngIf="fotoUrl" [src]="fotoUrl" class="header-avatar-img" />
+            <ion-icon *ngIf="!fotoUrl" name="person-circle"></ion-icon>
             <div class="online-indicator"></div>
           </div>
         </div>

@@ -115,6 +115,14 @@ $bg-app: #f4f7fe;
       color: white;
     }
 
+    .header-avatar-img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(255, 255, 255, 0.6);
+    }
+
     .online-indicator {
       position: absolute;
       bottom: 2px;

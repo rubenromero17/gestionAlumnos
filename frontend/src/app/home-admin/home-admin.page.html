@@ -1,0 +1,161 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="primary">
+    <ion-title>Panel Admin - Gestión</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="home-wrapper">
+    <div class="content-container">
+
+      <section class="attendance-section">
+        <ion-card class="attendance-hero-card">
+          <div class="attendance-content">
+            <div class="left-column">
+              <div class="user-greeting">
+                <span class="label">Panel de Control</span>
+                <h1 class="user-name">Administración</h1>
+              </div>
+              <div class="time-box">
+                <ion-icon name="people-outline"></ion-icon>
+                <div class="time-text">
+                  <span class="schedule-label">ALUMNOS ACTIVOS</span>
+                  <span class="hours">{{ alumnos.length }} Estudiantes</span>
+                </div>
+              </div>
+            </div>
+            <div class="right-column">
+              <p class="instruction-text">Añade nuevos perfiles al sistema.</p>
+              <ion-button class="fichar-button" (click)="cargarDatosDesdeBD()">
+                <ion-icon name="person-add-outline" slot="start"></ion-icon>
+                NUEVO
+              </ion-button>
+            </div>
+          </div>
+        </ion-card>
+      </section>
+
+      <hr class="divider">
+
+      <!-- SECCIÓN USUARIOS -->
+      <section>
+        <div class="usuarios-header">
+          <div class="usuarios-title-block">
+            <h2 class="section-title" style="margin: 0;">Usuarios del Sistema</h2>
+            <span class="usuarios-count">{{ filtroUsuarios.length }} usuario{{ filtroUsuarios.length !== 1 ? 's' : '' }}</span>
+          </div>
+
+          <div class="usuarios-controles">
+            <ion-searchbar
+              placeholder="Buscar por nombre o ID..."
+              (ionInput)="buscarUsuario($event)"
+              style="max-width: 320px; --border-radius: 12px;">
+            </ion-searchbar>
+
+            <div class="filtro-roles">
+              <button
+                class="filtro-btn"
+                [class.active]="filtroRol === ''"
+                (click)="filtrarPorRol('')">
+                Todos
+              </button>
+              <button
+                class="filtro-btn filtro-admin"
+                [class.active]="filtroRol === 'ADMIN'"
+                (click)="filtrarPorRol('ADMIN')">
+                Admin
+              </button>
+              <button
+                class="filtro-btn filtro-alumno"
+                [class.active]="filtroRol === 'ALUMNO'"
+                (click)="filtrarPorRol('ALUMNO')">
+                Alumno
+              </button>
+              <button
+                class="filtro-btn filtro-profesor"
+                [class.active]="filtroRol === 'PROFESOR'"
+                (click)="filtrarPorRol('PROFESOR')">
+                Profesor
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- LISTA DE USUARIOS -->
+        <div class="usuarios-lista" *ngIf="!loadingUsuarios">
+
+          <div class="usuario-item" *ngFor="let u of filtroUsuarios">
+            <div class="usuario-avatar" [ngClass]="'avatar-' + u.rol?.toLowerCase()">
+              <ion-icon [name]="getIconoPorRol(u.rol)"></ion-icon>
+            </div>
+            <div class="usuario-info">
+              <span class="usuario-nombre">{{ u.nombreReal }}</span>
+              <span class="usuario-id">ID: {{ u.id }}</span>
+            </div>
+            <div class="usuario-rol-badge" [ngClass]="'rol-' + u.rol?.toLowerCase()">
+              {{ u.rol }}
+            </div>
+            <div class="usuario-acciones">
+              <ion-button fill="clear" size="small" class="accion-btn edit-btn">
+                <ion-icon name="pencil-outline" slot="icon-only"></ion-icon>
+              </ion-button>
+              <ion-button fill="clear" size="small" class="accion-btn delete-btn" (click)="eliminarUsuario(u.id)">
+                <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+              </ion-button>
+            </div>
+          </div>
+
+          <!-- ESTADO VACÍO -->
+          <div class="usuarios-vacio" *ngIf="filtroUsuarios.length === 0">
+            <ion-icon name="search-outline"></ion-icon>
+            <p>No se encontraron usuarios con ese criterio.</p>
+          </div>
+
+        </div>
+
+        <!-- SKELETON LOADING -->
+        <div class="usuarios-lista" *ngIf="loadingUsuarios">
+          <div class="usuario-item skeleton" *ngFor="let i of [1,2,3,4,5]">
+            <div class="usuario-avatar skeleton-box"></div>
+            <div class="usuario-info">
+              <span class="skeleton-line wide"></span>
+              <span class="skeleton-line short"></span>
+            </div>
+            <div class="skeleton-line medium"></div>
+          </div>
+        </div>
+
+      </section>
+
+      <hr class="divider">
+
+      <section class="new-projects">
+        <div class="section-header">
+          <h2 class="section-title">Proyectos en Curso</h2>
+          <p class="section-subtitle">Supervisión de estados y entregas.</p>
+        </div>
+        <ion-grid>
+          <ion-row>
+            <ion-col size="12" size-md="6" *ngFor="let p of proyectos">
+              <ion-card class="interactive-card new-project-card">
+                <ion-card-header>
+                  <div class="cat-label">{{ p.categoria }}</div>
+                  <ion-card-title>{{ p.titulo }}</ion-card-title>
+                </ion-card-header>
+                <ion-card-content>
+                  <div class="status-section">
+                    <div class="progress-header">
+                      <span class="progress-percent">{{ p.progreso }}% completado</span>
+                    </div>
+                    <ion-progress-bar [value]="p.progreso / 100" color="success"></ion-progress-bar>
+                  </div>
+                </ion-card-content>
+              </ion-card>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </section>
+
+    </div>
+  </div>
+</ion-content>

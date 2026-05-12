@@ -12,7 +12,7 @@ import {
   personCircle, closeOutline, exitOutline, timeOutline,
   logInOutline, addCircleOutline, chatbubblesOutline,
   chatbubbleEllipsesOutline, send, statsChartOutline,
-  listOutline, checkmarkDoneCircle
+  listOutline, checkmarkDoneCircle, eyeOutline
 } from 'ionicons/icons';
 import { RouterLink } from '@angular/router';
 import { HeaderComponent } from "../components/header/header.component";
@@ -103,7 +103,7 @@ export class HomePage implements OnInit {
       personCircle, closeOutline, exitOutline, timeOutline,
       logInOutline, addCircleOutline, chatbubblesOutline,
       chatbubbleEllipsesOutline, send, statsChartOutline,
-      listOutline, checkmarkDoneCircle
+      listOutline, checkmarkDoneCircle, eyeOutline
     });
   }
 
