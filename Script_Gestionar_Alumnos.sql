@@ -126,6 +126,7 @@ CREATE TABLE asistencia (
 
 INSERT INTO modalidad (nombre) VALUES ('Presencial'), ('Online'), ('Semipresencial');
 
+-- 1 admin + 11 alumnos
 INSERT INTO usuario (nombre_usuario, contrasena_hash, rol, nombre_real) VALUES 
 ('admin_jose',   'hash_secure_123', 'administrador', 'José Rodríguez'),
 ('maria_garcia', 'hash_student_99', 'alumno',        'María García'),
