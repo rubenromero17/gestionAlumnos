@@ -1,7 +1,7 @@
 <app-header [mostrarFlecha]="true"></app-header>
 
 <ion-content [fullscreen]="true">
-  <ion-button (click)="navegarAdmin()" color="danger" expand="block">
+  <ion-button *ngIf="userData.rol === 'administrador'" (click)="navegarAdmin()" color="danger" expand="block">
     ENTRAR PANEL ADMIN
   </ion-button>
   <div class="home-wrapper">
@@ -72,8 +72,7 @@
                       <!-- Alumno y administrador: selector editable -->
                       <div class="custom-input modalidad-select-wrapper" *ngIf="userData.rol === 'alumno' || userData.rol === 'administrador'">
                         <label class="modalidad-label">Modalidad</label>
-                        <select class="modalidad-select" [(ngModel)]="modalidadIdSeleccionada">
-                          <option [ngValue]="null" disabled>Selecciona una modalidad</option>
+                        <select class="modalidad-select" [(ngModel)]="modalidadIdSeleccionada" (ngModelChange)="onModalidadChange($event)">                          <option [ngValue]="null" disabled>Selecciona una modalidad</option>
                           <option *ngFor="let m of modalidades" [ngValue]="m.id">{{ m.nombre }}</option>
                         </select>
                       </div>

@@ -350,4 +350,11 @@ export class ProfilePage implements OnInit {
   navegarAdmin() {
     this.navCtrl.navigateForward('/home-admin');
   }
+
+  onModalidadChange(id: number | null): void {
+    const encontrada = this.modalidades.find(m => m.id === id);
+    if (encontrada) {
+      this.userData.modalidad = encontrada.nombre;
+    }
+  }
 }
