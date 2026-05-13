@@ -8,17 +8,37 @@
             <div class="form-section">
               <ion-card-title>BIENVENIDO</ion-card-title>
               <div class="inputs-wrapper">
+
                 <div class="custom-input">
-                  <label class="input-label">Email</label>
-                  <ion-input type="email" placeholder="ejemplo@correo.com" class="styled-input"></ion-input>
+                  <label class="input-label">Usuario</label>
+                  <ion-input
+                    type="text"
+                    placeholder="tu_usuario"
+                    class="styled-input"
+                    [(ngModel)]="nombreUsuario">
+                  </ion-input>
                 </div>
+
                 <div class="custom-input">
-                  <label class="input-label">Password</label>
-                  <ion-input type="password" placeholder="********" class="styled-input"></ion-input>
+                  <label class="input-label">Contraseña</label>
+                  <ion-input
+                    type="password"
+                    placeholder="********"
+                    class="styled-input"
+                    [(ngModel)]="contrasena">
+                  </ion-input>
                 </div>
+
+                <ion-note color="danger" *ngIf="error">{{ error }}</ion-note>
+
               </div>
-              <ion-button expand="block" class="login-button" [routerLink]="['/home']">
-                Iniciar Sesión
+
+              <ion-button
+                expand="block"
+                class="login-button"
+                [disabled]="cargando"
+                (click)="iniciarSesion()">
+                {{ cargando ? 'Cargando...' : 'Iniciar Sesión' }}
               </ion-button>
 
               <div class="ion-text-center">

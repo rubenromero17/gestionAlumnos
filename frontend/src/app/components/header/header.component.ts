@@ -1,9 +1,11 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { IonButtons, IonHeader, IonIcon, IonSearchbar, IonToolbar } from "@ionic/angular/standalone";
-import { RouterLink } from "@angular/router";
+import { RouterLink, Router } from "@angular/router";
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../services/auth-service';
 import { addIcons } from "ionicons";
 import { arrowBackOutline, personCircle } from "ionicons/icons";
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-header',
@@ -20,25 +22,34 @@ import { arrowBackOutline, personCircle } from "ionicons/icons";
     CommonModule
   ]
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent implements OnInit, OnDestroy {
   @Input() mostrarFlecha: boolean = true;
-
   @Output() search = new EventEmitter<string>();
 
   fotoUrl: string | null = null;
   nombreUsuario: string = 'Usuario Pro';
 
-  constructor() {
+  private sesionSub?: Subscription;
+
+  constructor(private authService: AuthService, private router: Router) {
     addIcons({ arrowBackOutline, personCircle });
   }
 
   ngOnInit() {
-    this.fotoUrl = localStorage.getItem('profile_foto');
-    const savedData = localStorage.getItem('profile_data');
-    if (savedData) {
-      const data = JSON.parse(savedData);
-      if (data.nombre_real) this.nombreUsuario = data.nombre_real;
-    }
+    this.sesionSub = this.authService.sesion$.subscribe(sesion => {
+      if (sesion) {
+        this.nombreUsuario = sesion.nombreReal;
+      }
+      this.fotoUrl = localStorage.getItem('profile_foto');
+    });
+  }
+
+  ngOnDestroy() {
+    this.sesionSub?.unsubscribe();
+  }
+
+  goBack() {
+    this.router.navigate(['/home']);
   }
 
   onSearch(event: any) {
