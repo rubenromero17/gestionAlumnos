@@ -1,9 +1,8 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { IonButtons, IonHeader, IonIcon, IonSearchbar, IonToolbar } from "@ionic/angular/standalone";
-import { RouterLink } from "@angular/router";
+import { RouterLink, Router } from "@angular/router";
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth-service';
-import { Location } from '@angular/common';
 import { addIcons } from "ionicons";
 import { arrowBackOutline, personCircle } from "ionicons/icons";
 import { Subscription } from 'rxjs';
@@ -32,7 +31,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   private sesionSub?: Subscription;
 
-  constructor(private authService: AuthService, private location: Location) {
+  constructor(private authService: AuthService, private router: Router) {
     addIcons({ arrowBackOutline, personCircle });
   }
 
@@ -50,7 +49,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   goBack() {
-    this.location.back();
+    this.router.navigate(['/home']);
   }
 
   onSearch(event: any) {
