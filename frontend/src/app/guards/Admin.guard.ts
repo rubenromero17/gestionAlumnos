@@ -7,6 +7,9 @@ export const adminGuard: CanActivateFn = () => {
   const router = inject(Router);
   const sesion = auth.obtenerSesion();
 
+  console.log('ROL EN SESIÓN:', sesion?.rol); // 👈 mira qué imprime exactamente
+
+
   if (sesion?.rol === 'administrador') {
     return true;
   }
@@ -14,6 +17,8 @@ export const adminGuard: CanActivateFn = () => {
   if (sesion) {
     return router.createUrlTree(['/home']);
   }
+
+
 
   return router.createUrlTree(['/login']);
 };
