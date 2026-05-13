@@ -6,4 +6,5 @@ export interface proyecto {
   descripcion: string;
   cupoMaximo: number;
   estado: EstadoProyecto;
+  fotoProyecto?: string | null;
 }

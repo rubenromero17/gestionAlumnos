@@ -71,6 +71,7 @@ public class ProyectoService {
             existing.setDescripcion(dto.getDescripcion());
             existing.setCupoMaximo(dto.getCupoMaximo());
             existing.setEstado(dto.getEstado());
+            existing.setFotoProyecto(dto.getFotoProyecto());
             return proyectoMapper.toDTO(proyectoRepository.save(existing));
         });
     }
