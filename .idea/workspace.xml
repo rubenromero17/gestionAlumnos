@@ -2,10 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="aa129bd7-0f4c-4eed-ba87-9562a71d0507" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/example/backend/repositories/ProyectoRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/example/backend/repositories/ProyectoRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/example/backend/services/ProyectoService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/example/backend/services/ProyectoService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/home/home.page.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/home/home.page.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/home/home.page.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/home/home.page.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/app/profile/profile.page.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/profile/profile.page.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/app/profile/profile.page.scss" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/profile/profile.page.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/app/profile/profile.page.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/profile/profile.page.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/global.scss" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/global.scss" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -55,10 +56,24 @@
       <workItem from="1778749321567" duration="567000" />
       <workItem from="1778750991897" duration="221000" />
       <workItem from="1778754588628" duration="89000" />
+      <workItem from="1778756983251" duration="1265000" />
+      <workItem from="1778758360693" duration="111000" />
+      <workItem from="1778758772468" duration="207000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/frontend/src/app/profile/profile.page.ts</url>
+          <line>4</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

@@ -22,12 +22,15 @@
               <ion-card-header class="ion-text-center">
                 <ion-card-title>{{ userData.nombre_real }}</ion-card-title>
                 <ion-card-subtitle>{{ userData.rol | titlecase }}</ion-card-subtitle>
+                <!-- El chip va FUERA del card-header, no dentro -->
               </ion-card-header>
-              <ion-card-content>
+                <ion-card-content>
+                  <div style="text-align:center; margin-bottom: 8px;">
+                  </div>
                 <div class="user-stats">
                   <div class="stat-item">
-                    <span class="stat-value">12</span>
-                    <span class="stat-label">Proyectos</span>
+                    <span class="stat-value">{{ numProyectos }}</span>
+                    <span class="stat-label">Proyectos inscrito</span>
                   </div>
                   <div class="stat-item">
                     <span class="stat-value">
@@ -36,9 +39,13 @@
                     <span class="stat-label">{{ userData.modalidad }}</span>
                   </div>
                 </div>
-                <ion-button expand="block" fill="outline" class="action-button" (click)="fileInput.click()">
-                  Editar Foto
-                </ion-button>
+                <div class="admin-banner">
+                  <ion-button *ngIf="userData.rol === 'administrador'" (click)="navegarAdmin()"
+                              color="danger" expand="block" shape="round">
+                    <ion-icon name="settings-outline" slot="start"></ion-icon>
+                    Panel de Administración
+                  </ion-button>
+                </div>
               </ion-card-content>
             </ion-card>
           </ion-col>
@@ -47,7 +54,10 @@
           <ion-col size="12" size-lg="8">
             <ion-card class="interactive-card info-card">
               <ion-card-header>
-                <ion-card-title>Configuración de Cuenta</ion-card-title>
+                <ion-card-title>
+                  <ion-icon name="person-circle-outline" style="vertical-align: middle; margin-right: 8px;"></ion-icon>
+                  Configuración de Cuenta
+                </ion-card-title>
               </ion-card-header>
 
               <ion-card-content>
@@ -67,6 +77,38 @@
                       <ion-item class="custom-input">
                         <ion-input label="Rol de Sistema" labelPlacement="stacked" [value]="userData.rol" readonly="true"></ion-input>
                       </ion-item>
+                      <ion-card class="interactive-card proyectos-card">
+                        <ion-card-header>
+                          <ion-card-title>
+                            <ion-icon name="folder-open-outline" style="vertical-align:middle; margin-right:8px;"></ion-icon>
+                            Proyectos activos
+                          </ion-card-title>
+                        </ion-card-header>
+
+                        <ion-card-content>
+                          <!-- Estado vacío -->
+                          <div class="proyectos-empty" *ngIf="proyectosActivos.length === 0">
+                            <ion-icon name="folder-open-outline"></ion-icon>
+                            <p>No tienes proyectos activos en este momento.</p>
+                          </div>
+                          <div class="proyectos-grid" *ngIf="proyectosActivos.length > 0">
+                            <div class="proyecto-mini-card" *ngFor="let p of proyectosActivos">
+                              <div class="proyecto-mini-header">
+                                <div class="proyecto-mini-icon">
+                                  <ion-icon name="briefcase-outline"></ion-icon>
+                                </div>
+                                <div class="proyecto-mini-badge">En curso</div>
+                              </div>
+                              <div class="proyecto-mini-titulo">{{ p.titulo }}</div>
+                              <div class="proyecto-mini-desc">{{ p.descripcion | slice:0:60 }}{{ p.descripcion.length > 60 ? '...' : '' }}</div>
+                              <div class="proyecto-mini-footer">
+                                <ion-icon name="people-outline"></ion-icon>
+                                <span>{{ p.cupoMaximo - p.cuposDisponibles }} / {{ p.cupoMaximo }} miembros</span>
+                              </div>
+                            </div>
+                          </div>
+                        </ion-card-content>
+                      </ion-card>
                     </ion-col>
                     <ion-col size="12" size-md="6">
                       <!-- Alumno y administrador: selector editable -->
