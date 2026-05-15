@@ -57,7 +57,7 @@ public class ModalidadService {
         if (!modalidadRepository.existsById(id)) {
             throw new ElementoNoEncontradoException("Modalidad no encontrada con id: " + id);
         }
-        
+
         alumnoRepository.findAll().stream()
                 .filter(a -> a.getModalidad() != null && a.getModalidad().getId().equals(id))
                 .forEach(a -> {

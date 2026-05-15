@@ -39,8 +39,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.sesionSub = this.authService.sesion$.subscribe(sesion => {
       if (sesion) {
         this.nombreUsuario = sesion.nombreReal;
+        this.fotoUrl = localStorage.getItem(`profile_foto_${sesion.id}`);
+      } else {
+        this.fotoUrl = null;
       }
-      this.fotoUrl = localStorage.getItem('profile_foto');
     });
   }
 

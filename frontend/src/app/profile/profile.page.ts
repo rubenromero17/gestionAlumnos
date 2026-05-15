@@ -75,12 +75,13 @@ export class ProfilePage implements OnInit {
   }
 
   ngOnInit(): void {
-    const savedFoto = localStorage.getItem('profile_foto');
+    const sesion = this.authService.obtenerSesion();
+    const fotoKey = `profile_foto_${sesion?.id}`;
+    const savedFoto = localStorage.getItem(fotoKey);
     if (savedFoto) this.fotoUrl = savedFoto;
 
     this.cargarModalidades();
 
-    const sesion = this.authService.obtenerSesion();
     if (!sesion) {
       this.presentToast('No hay sesión activa. Por favor inicia sesión.', 'danger');
       this.navCtrl.navigateRoot('/login');
@@ -180,15 +181,16 @@ export class ProfilePage implements OnInit {
 
     this.comprimirImagen(file, 800, 0.75).then((base64Comprimida) => {
       this.fotoUrl = base64Comprimida;
+      const sesion = this.authService.obtenerSesion();
+      const fotoKey = `profile_foto_${sesion?.id}`;
 
       try {
-        localStorage.setItem('profile_foto', base64Comprimida);
+        localStorage.setItem(fotoKey, base64Comprimida);
       } catch (e) {
-        localStorage.removeItem('profile_foto');
-        try { localStorage.setItem('profile_foto', base64Comprimida); } catch (e2) {}
+        localStorage.removeItem(fotoKey);
+        try { localStorage.setItem(fotoKey, base64Comprimida); } catch (e2) {}
       }
 
-      const sesion = this.authService.obtenerSesion();
       if (sesion) {
         this.usuarioService.actualizarFoto(sesion.id, base64Comprimida).subscribe({
           next: () => this.presentToast('Foto actualizada correctamente', 'success'),
