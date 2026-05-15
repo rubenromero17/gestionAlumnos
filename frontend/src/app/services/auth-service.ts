@@ -53,6 +53,7 @@ export class AuthService {
   cerrarSesion(): void {
     const sesion = this.obtenerSesion();
     if (sesion?.id) {
+      localStorage.removeItem(`fechaFichaje_${sesion.id}`);
       localStorage.removeItem(`profile_foto_${sesion.id}`);
     }
     localStorage.removeItem('usuarioLogado');
