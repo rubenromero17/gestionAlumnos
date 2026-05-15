@@ -34,9 +34,6 @@ public class Proyecto {
     @Column(name = "foto_proyecto", columnDefinition = "LONGTEXT")
     private String fotoProyecto;
 
-    @Column(name = "video_url", length = 500)
-    private String videoUrl;
-
     @OneToMany(mappedBy = "proyecto")
     private Set<Asignacion> asignaciones = new HashSet<>();
 }

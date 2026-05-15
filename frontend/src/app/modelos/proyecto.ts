@@ -8,5 +8,4 @@ export interface proyecto {
   estado: EstadoProyecto;
   cuposDisponibles: number;
   fotoProyecto?: string | null;
-  videoUrl?: string;
 }

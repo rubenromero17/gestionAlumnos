@@ -54,8 +54,7 @@ export class HomeAdminPage implements OnInit {
   modalProyectoAbierto: boolean = false;
   proyectoEditando: proyecto | null = null;
   guardandoProyecto: boolean = false;
-  formProyecto: { titulo: string; descripcion: string; cupoMaximo: number; estado: EstadoProyecto; fotoProyecto: string | null; videoUrl: string } =
-    { titulo: '', descripcion: '', cupoMaximo: 5, estado: 'en curso', fotoProyecto: null, videoUrl: '' };
+  formProyecto = { titulo: '', descripcion: '', cupoMaximo: 5, estado: 'en curso' as EstadoProyecto, fotoProyecto: '' };
 
   @ViewChild('inputImagen') inputImagenRef!: ElementRef<HTMLInputElement>;
 
@@ -162,14 +161,9 @@ export class HomeAdminPage implements OnInit {
 
   abrirModalProyecto(p: proyecto | null) {
     this.proyectoEditando = p;
-    this.formProyecto = {
-      titulo: p?.titulo || '',
-      descripcion: p?.descripcion || '',
-      cupoMaximo: p?.cupoMaximo || 1,
-      estado: p?.estado || 'en curso',
-      fotoProyecto: p?.fotoProyecto || null,
-      videoUrl: p?.videoUrl || ''   // ← añade esto
-    };
+    this.formProyecto = p
+      ? { titulo: p.titulo, descripcion: p.descripcion, cupoMaximo: p.cupoMaximo, estado: p.estado, fotoProyecto: p.fotoProyecto ?? '' }
+      : { titulo: '', descripcion: '', cupoMaximo: 5, estado: 'en curso', fotoProyecto: '' };
     this.guardandoProyecto = false;
     this.modalProyectoAbierto = true;
   }
@@ -190,7 +184,6 @@ export class HomeAdminPage implements OnInit {
       cupoMaximo:   this.formProyecto.cupoMaximo,
       estado:       this.formProyecto.estado,
       fotoProyecto: this.formProyecto.fotoProyecto || null,
-      videoUrl:     this.formProyecto.videoUrl || '',
     };
 
     if (this.proyectoEditando) {
