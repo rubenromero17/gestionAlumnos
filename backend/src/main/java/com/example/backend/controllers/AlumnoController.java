@@ -26,11 +26,4 @@ public class AlumnoController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
-
-    @GetMapping("/usuario/{usuarioId}")
-    public ResponseEntity<AlumnoDTO> findByUsuarioId(@PathVariable Long usuarioId) {
-        return alumnoService.findByUsuarioId(usuarioId)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
 }
