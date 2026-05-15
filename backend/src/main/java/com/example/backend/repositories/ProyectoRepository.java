@@ -18,6 +18,9 @@ public interface ProyectoRepository extends JpaRepository<Proyecto, Long> {
     // Proyectos en los que el alumno NO está inscrito
     @Query("SELECT p FROM Proyecto p WHERE p.id NOT IN (" +
             "  SELECT a.id.proyectoId FROM Asignacion a WHERE a.id.alumnoId = :alumnoId" +
-            ")")
-    List<Proyecto> findByAsignaciones_AlumnoIdNotContaining(@Param("alumnoId") Long alumnoId);
+            ") AND p.estado = :estado")
+    List<Proyecto> findByAsignaciones_AlumnoIdNotContaining(
+            @Param("alumnoId") Long alumnoId,
+            @Param("estado") EstadoProyecto estado
+    );
 }

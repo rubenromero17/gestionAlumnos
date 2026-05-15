@@ -5,12 +5,12 @@ import {
   IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton,
   IonIcon, IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardSubtitle,
   IonCardTitle, IonCardContent, IonList, IonItem, IonInput, IonModal, IonSearchbar,
-  IonLabel, IonToggle, IonChip, NavController, ToastController,
+  IonLabel, IonToggle, NavController, ToastController
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   personCircle, personOutline, closeOutline, schoolOutline, lockClosedOutline, exitOutline,
-  timeOutline, shieldCheckmarkOutline, desktopOutline, addOutline, trashOutline, folderOpenOutline, briefcaseOutline, peopleOutline
+  timeOutline, shieldCheckmarkOutline, desktopOutline, addOutline, trashOutline
 } from 'ionicons/icons';
 import { RouterLink } from '@angular/router';
 import { HeaderComponent } from '../components/header/header.component';
@@ -18,8 +18,7 @@ import { AuthService } from '../services/auth-service';
 import { UsuarioService } from '../services/usuario-service';
 import { CambioPasswordDTO } from '../services/usuario-service';
 import { ModalidadService } from '../services/modalidad-service';
-import { ProyectoService } from '../services/proyecto-service';
-import { proyecto } from '../modelos/proyecto';
+
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.page.html',
@@ -31,15 +30,13 @@ import { proyecto } from '../modelos/proyecto';
     IonList, IonItem, IonInput, CommonModule, FormsModule,
     RouterLink,
     IonModal, IonHeader, IonTitle, IonToolbar, IonButtons,
-    IonLabel, IonToggle, IonSearchbar, IonChip, HeaderComponent
+    IonLabel, IonToggle, IonSearchbar, HeaderComponent
   ]
 })
 export class ProfilePage implements OnInit {
 
   isPasswordModalOpen = false;
   fotoUrl: string | null = null;
-  numProyectos: number = 0;
-  proyectosActivos: proyecto[] = [];
 
   modalidades: { id: number; nombre: string }[] = [];
   modalidadIdSeleccionada: number | null = null;
@@ -70,11 +67,10 @@ export class ProfilePage implements OnInit {
     private authService: AuthService,
     private usuarioService: UsuarioService,
     private modalidadService: ModalidadService,
-    private proyectoService: ProyectoService,
   ) {
     addIcons({
       personCircle, personOutline, closeOutline, lockClosedOutline, schoolOutline, exitOutline,
-      timeOutline, shieldCheckmarkOutline, desktopOutline, addOutline, trashOutline,  folderOpenOutline, briefcaseOutline, peopleOutline
+      timeOutline, shieldCheckmarkOutline, desktopOutline, addOutline, trashOutline
     });
   }
 
@@ -113,30 +109,10 @@ export class ProfilePage implements OnInit {
         if (!this.fotoUrl && (usuario as any).fotoUsuario) {
           this.fotoUrl = (usuario as any).fotoUsuario;
         }
-        // Total de proyectos inscritos (para el contador del perfil)
-        this.proyectoService.getProyectosPorAlumno(sesion.id).subscribe({
-          next: (proyectos) => {
-            this.numProyectos = proyectos.length;
-          },
-          error: () => {
-            this.numProyectos = 0;
-          }
-        });
-
-// Proyectos activos con cupos en tiempo real (va directo a la tabla de proyectos)
-        this.proyectoService.getProyectosActivos(sesion.id).subscribe({
-          next: (proyectos) => {
-            this.proyectosActivos = proyectos;
-          },
-          error: () => {
-            this.proyectosActivos = [];
-          }
-        });
       },
       error: () => {
         this.presentToast('No se pudieron cargar todos los datos del perfil', 'warning');
       }
-
     });
   }
 
@@ -280,9 +256,27 @@ export class ProfilePage implements OnInit {
       nombreUsuario: this.userData.nombre_usuario,
     }).subscribe({
       next: async () => {
-        sesion.nombreReal = this.userData.nombre_real;
-        sesion.nombreUsuario = this.userData.nombre_usuario;
-        this.authService.guardarSesion(sesion);
+        // Recargar el usuario desde el servidor para que el rol (y cualquier otro
+        // campo actualizado manualmente en BD) quede reflejado en la sesión local.
+        this.usuarioService.getUsuarioById(sesion.id).subscribe({
+          next: (usuarioActualizado) => {
+            const sesionActualizada = {
+              ...sesion,
+              nombreReal: usuarioActualizado.nombreReal,
+              nombreUsuario: usuarioActualizado.nombreUsuario,
+              rol: usuarioActualizado.rol,
+            };
+            this.authService.guardarSesion(sesionActualizada);
+            // Actualizar userData local con el rol real
+            this.userData.rol = usuarioActualizado.rol;
+          },
+          error: () => {
+            // Fallback: al menos guardar los campos que sí editamos
+            sesion.nombreReal = this.userData.nombre_real;
+            sesion.nombreUsuario = this.userData.nombre_usuario;
+            this.authService.guardarSesion(sesion);
+          }
+        });
 
         if ((sesion.rol === 'alumno' || sesion.rol === 'administrador') && this.modalidadIdSeleccionada) {
           this.usuarioService.actualizarModalidad(sesion.id, this.modalidadIdSeleccionada).subscribe({
