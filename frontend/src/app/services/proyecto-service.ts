@@ -56,4 +56,8 @@ export class ProyectoService {
       body: { alumnoId, proyectoId }
     });
   }
+
+  getAlumnosPorProyecto(proyectoId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiService.apiUrl}/asignacion/proyecto/${proyectoId}`);
+  }
 }
