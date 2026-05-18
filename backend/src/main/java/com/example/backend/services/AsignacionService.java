@@ -2,11 +2,13 @@ package com.example.backend.services;
 
 import com.example.backend.dto.AsignacionDTO;
 import com.example.backend.dto.ProyectoDTO;
+import com.example.backend.dto.UsuarioDTO;
 import com.example.backend.exception.CupoLlenoException;
 import com.example.backend.exception.ElementoNoEncontradoException;
 import com.example.backend.exception.ResourceAlreadyExistsException;
 import com.example.backend.mapper.AsignacionMapper;
 import com.example.backend.mapper.ProyectoMapper;
+import com.example.backend.mapper.UsuarioMapper;
 import com.example.backend.models.Alumno;
 import com.example.backend.models.Asignacion;
 import com.example.backend.models.AsignacionId;
@@ -32,6 +34,9 @@ public class AsignacionService {
 
     @Autowired
     private AsignacionMapper asignacionMapper;
+
+    @Autowired
+    private UsuarioMapper usuarioMapper;
 
     @Autowired
     private ProyectoMapper proyectoMapper;
@@ -106,5 +111,14 @@ public class AsignacionService {
         }
 
         asignacionRepository.deleteById(id);
+    }
+
+    public List<UsuarioDTO> findUsuariosByProyecto(Long proyectoId) {
+        // Asumiendo que tu repositorio tiene un método findByProyectoId()
+        // y que tu entidad Asignacion tiene acceso al Alumno y luego al Usuario
+        return asignacionRepository.findByProyectoId(proyectoId).stream()
+                .map(asignacion -> asignacion.getAlumno().getUsuario())
+                .map(usuarioMapper::toDTO)
+                .collect(Collectors.toList());
     }
 }

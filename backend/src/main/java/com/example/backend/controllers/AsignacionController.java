@@ -2,6 +2,7 @@ package com.example.backend.controllers;
 
 import com.example.backend.dto.AsignacionDTO;
 import com.example.backend.dto.ProyectoDTO;
+import com.example.backend.dto.UsuarioDTO;
 import com.example.backend.models.AsignacionId;
 import com.example.backend.services.AsignacionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,5 +51,11 @@ public class AsignacionController {
         Long proyectoId = body.get("proyectoId");
         asignacionService.salir(alumnoId, proyectoId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/proyecto/{proyectoId}")
+    public ResponseEntity<List<UsuarioDTO>> getAlumnosPorProyecto(@PathVariable Long proyectoId) {
+        List<UsuarioDTO> alumnos = asignacionService.findUsuariosByProyecto(proyectoId);
+        return ResponseEntity.ok(alumnos);
     }
 }

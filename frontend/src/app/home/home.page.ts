@@ -56,7 +56,6 @@ export class HomePage implements OnInit {
   horarioHoy: { horaInicio: string; horaFin: string } | null = null;
   franjaActiva: 'activa' | null = null;
 
-  // Formulario para añadir horario cuando no tiene NINGUNO guardado
   mostrarFormHorario = false;
   guardandoHorario = false;
   alumnoIdReal: number | null = null;
@@ -453,13 +452,21 @@ export class HomePage implements OnInit {
     });
   }
 
-  // ─────────────────────────────────────────────────────────────
-  // MODAL Y COMENTARIOS
-  // ─────────────────────────────────────────────────────────────
-  verDetalles(p: proyecto, inscrito: boolean) {
-    this.proyectoSeleccionado = p;
+
+  verDetalles(p: any, inscrito: boolean) {
+    this.proyectoSeleccionado = { ...p, alumnos: [] };
     this.esProyectoInscrito = inscrito;
     this.isModalOpen = true;
+
+    this.proyectoService.getAlumnosPorProyecto(p.id).subscribe({
+      next: (alumnosBackend: any[]) => {
+        this.proyectoSeleccionado.alumnos = alumnosBackend;
+      },
+      error: (err) => {
+        console.warn('[WARN] No se pudo cargar la lista de alumnos para este proyecto', err);
+        this.proyectoSeleccionado.alumnos = [];
+      }
+    });
   }
 
   agregarComentario() {

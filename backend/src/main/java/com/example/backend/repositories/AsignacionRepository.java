@@ -12,6 +12,7 @@ public interface AsignacionRepository extends JpaRepository<Asignacion, Asignaci
     long countByIdProyectoId(Long proyectoId);
     boolean existsByIdAlumnoIdAndIdProyectoId(Long alumnoId, Long proyectoId);
 
-    // Devuelve todas las asignaciones de un alumno concreto
     List<Asignacion> findByIdAlumnoId(Long alumnoId);
+
+    List<Asignacion> findByProyectoId(Long proyectoId);
 }
