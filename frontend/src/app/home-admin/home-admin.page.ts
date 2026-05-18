@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild, ElementRef, inject} from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -19,7 +19,10 @@ import {
   addOutline, createOutline, addCircleOutline, folderOpenOutline,
   playCircleOutline, pauseCircleOutline, checkmarkCircleOutline,
   imageOutline, timeOutline, logInOutline, logOutOutline, calendarOutline, saveOutline,
-  checkmarkDoneCircle
+  checkmarkDoneCircle,
+  // ── AFK ──────────────────────────────────────────────────────
+  closeCircleOutline, checkmarkDoneCircleOutline,
+  chevronUpOutline, chevronDownOutline
 } from 'ionicons/icons';
 import { alumno } from '../modelos/alumno';
 import { AlumnoService } from '../services/alumno-service';
@@ -30,6 +33,8 @@ import { AuthService } from '../services/auth-service';
 import { proyecto, EstadoProyecto } from '../modelos/proyecto';
 import { HeaderComponent } from '../components/header/header.component';
 import { forkJoin } from 'rxjs';
+import { RegistroActividad, RegistroActividadService } from "../services/registro-actividad-service";
+// ── AFK ────────────────────────────────────────────────────────
 
 @Component({
   selector: 'app-home-admin',
@@ -50,12 +55,8 @@ export class HomeAdminPage implements OnInit {
 
   mostrarTodosUsuarios: boolean = false;
   mostrarTodosProyectos: boolean = false;
-
   // ── FIX: mapa usuarioId → alumnoId para cruzar usuarios con asistencia ──────
-  // La tabla asistencia guarda alumnoId, pero la lista de usuarios usa usuario.id.
-  // Sin este mapa, haFichadoHoy() siempre devuelve false porque compara IDs distintos.
   private usuarioIdToAlumnoId: Map<number, number> = new Map();
-
   // ── Fichaje del administrador ──────────────────────────────────────────────
   mostrarTarjetaAsistencia = false;
   isExiting = false;
@@ -80,9 +81,11 @@ export class HomeAdminPage implements OnInit {
   modalProyectoAbierto: boolean = false;
   proyectoEditando: proyecto | null = null;
   guardandoProyecto: boolean = false;
-  formProyecto: { titulo: string; descripcion: string; cupoMaximo: number; estado: EstadoProyecto; fotoProyecto: string | null; videoUrl: string } =
+  formProyecto: {
+    titulo: string; descripcion: string; cupoMaximo: number; estado: EstadoProyecto;
+    fotoProyecto: string | null; videoUrl: string
+  } =
     { titulo: '', descripcion: '', cupoMaximo: 5, estado: 'en curso', fotoProyecto: null, videoUrl: '' };
-
   @ViewChild('inputImagen') inputImagenRef!: ElementRef<HTMLInputElement>;
 
   // Usuarios
@@ -92,17 +95,16 @@ export class HomeAdminPage implements OnInit {
   textoBusqueda: string = '';
   filtroRol: string = '';
   filtroFichado: string = '';
-
-  // Set con los alumnoId que han fichado hoy (viene de la BD)
+  // Set con los alumnoId que han fichado hoy
   fichadosHoyIds: Set<number> = new Set();
   fichadosHoyMap: Map<number, AsistenciaDTO> = new Map();
 
   // Modal edición individual
   modalEdicionAbierto: boolean = false;
-  usuarioEditando: Usuario | null = null;
+  usuarioEditando: Usuario |
+    null = null;
   guardandoEdicion: boolean = false;
   formEdicion = { nombreReal: '', nombreUsuario: '', rol: '', contrasenaHash: '' };
-
   // Modal cambio masivo de rol
   modalCambioMasivoAbierto: boolean = false;
   seleccionadosMasivo: number[] = [];
@@ -110,9 +112,13 @@ export class HomeAdminPage implements OnInit {
   guardandoCambioMasivo: boolean = false;
   busquedaMasivo: string = '';
   usuariosFiltradosMasivo: Usuario[] = [];
-
+  // ── AFK ──────────────────────────────────────────────────────
+  registrosAfk: RegistroActividad[] = [];
+  loadingAfk: boolean = true;
+  mostrarTodosAfk: boolean = false;
   private asistenciaService = inject(AsistenciaService);
   private authService = inject(AuthService);
+  private registroActividadService = inject(RegistroActividadService);
 
   constructor(
     private alumnoService: AlumnoService,
@@ -130,7 +136,10 @@ export class HomeAdminPage implements OnInit {
       addOutline, createOutline, addCircleOutline, folderOpenOutline,
       playCircleOutline, pauseCircleOutline, checkmarkCircleOutline,
       imageOutline, timeOutline, logInOutline, logOutOutline, calendarOutline, saveOutline,
-      checkmarkDoneCircle
+      checkmarkDoneCircle,
+      // ── AFK ────────────────────────────────────────────────
+      closeCircleOutline, checkmarkDoneCircleOutline,
+      chevronUpOutline, chevronDownOutline
     });
   }
 
@@ -138,19 +147,15 @@ export class HomeAdminPage implements OnInit {
     this.authService.sesion$.subscribe(sesion => {
       this.nombreUsuario = sesion?.nombreReal ?? 'Administrador';
     });
-
-    // Cargamos alumnos y usuarios juntos para que el mapa esté listo
-    // antes de aplicar el filtro de fichados
     this.cargarAlumnosYUsuarios();
     this.cargarProyectos();
     this.cargarHorarioYFichaje();
+    this.cargarRegistrosAfkHoy(); // ── AFK
   }
 
   // ─────────────────────────────────────────────────────────────
   // CARGA CONJUNTA alumnos + usuarios
   // ─────────────────────────────────────────────────────────────
-  // Unificamos en un solo forkJoin para garantizar que el mapa
-  // usuarioId→alumnoId existe cuando lleguen los fichados de hoy.
   cargarAlumnosYUsuarios() {
     this.loading = true;
     this.loadingUsuarios = true;
@@ -162,9 +167,6 @@ export class HomeAdminPage implements OnInit {
       next: ({ alumnos, usuarios }) => {
         this.alumnos = alumnos;
 
-        // ── FIX: construir el mapa usuarioId → alumnoId ──────────────────
-        // El backend devuelve el campo como "usuarioId" (camelCase estándar).
-        // Si tu entidad lo serializa diferente (ej. "usuario_id"), cámbialo aquí.
         this.usuarioIdToAlumnoId = new Map(
           alumnos
             .filter(a => a.id != null && ((a as any).usuarioId ?? (a as any).usuario_id) != null)
@@ -175,7 +177,6 @@ export class HomeAdminPage implements OnInit {
         this.loading = false;
         this.loadingUsuarios = false;
 
-        // Ahora que el mapa existe, cargamos los fichados y aplicamos filtros
         this.cargarFichadosHoy();
       },
       error: () => {
@@ -192,8 +193,6 @@ export class HomeAdminPage implements OnInit {
   cargarFichadosHoy() {
     this.asistenciaService.fichadosHoy().subscribe({
       next: (lista) => {
-        // Solo se consideran fichados los que tienen presente = 1 (true)
-        // Los registros con presente = 0 existen en la BD pero no cuentan como fichado
         this.fichadosHoyIds = new Set(
           lista.filter(a => !!a.presente).map(a => a.alumnoId)
         );
@@ -217,7 +216,6 @@ export class HomeAdminPage implements OnInit {
     const diaHoy = diasSemanaMap[new Date().getDay()];
     const ahora = new Date();
     const horaActual = ahora.getHours() * 60 + ahora.getMinutes();
-
     this.alumnoService.getAlumnoByUsuarioId(sesion.id).subscribe({
       next: (alumno: any) => {
         console.log('[DEBUG] Respuesta getAlumnoByUsuarioId (admin):', JSON.stringify(alumno));
@@ -308,7 +306,6 @@ export class HomeAdminPage implements OnInit {
       horaInicio: this.formHorario.horaInicio,
       horaFin: this.formHorario.horaFin
     };
-
     this.alumnoService.crearHorario(payload).subscribe({
       next: async () => {
         this.guardandoHorario = false;
@@ -324,7 +321,6 @@ export class HomeAdminPage implements OnInit {
 
   async fichar() {
     if (!this.adminIdReal) return;
-
     this.asistenciaService.fichar(this.adminIdReal).subscribe({
       next: async () => {
         await this.mostrarToast('✅ Entrada registrada correctamente', 'success');
@@ -339,7 +335,6 @@ export class HomeAdminPage implements OnInit {
 
   async desfichar() {
     if (!this.adminIdReal) return;
-
     this.asistenciaService.ficharSalida(this.adminIdReal).subscribe({
       next: async () => {
         await this.mostrarToast('✅ Salida registrada correctamente. ¡Buen trabajo hoy! 🚀', 'success');
@@ -353,8 +348,11 @@ export class HomeAdminPage implements OnInit {
     });
   }
 
-  
   // AHORA: convierte usuario.id → alumnoId usando el mapa y comprueba el Set
+
+  // ─────────────────────────────────────────────────────────────
+  // haFichadoHoy
+  // ─────────────────────────────────────────────────────────────
   haFichadoHoy(usuarioId: number): boolean {
     const alumnoId = this.usuarioIdToAlumnoId.get(usuarioId);
     if (alumnoId === undefined) return false;
@@ -408,10 +406,10 @@ export class HomeAdminPage implements OnInit {
 
   getIconoPorEstado(estado: string): string {
     switch (estado) {
-      case 'en curso':   return 'play-circle-outline';
-      case 'pausado':    return 'pause-circle-outline';
+      case 'en curso': return 'play-circle-outline';
+      case 'pausado': return 'pause-circle-outline';
       case 'finalizado': return 'checkmark-circle-outline';
-      default:           return 'folder-open-outline';
+      default: return 'folder-open-outline';
     }
   }
 
@@ -423,7 +421,7 @@ export class HomeAdminPage implements OnInit {
       cupoMaximo: p?.cupoMaximo || 1,
       estado: p?.estado || 'en curso',
       fotoProyecto: p?.fotoProyecto || null,
-      videoUrl: p?.videoUrl || ''   // ← añade esto
+      videoUrl: p?.videoUrl || ''
     };
     this.guardandoProyecto = false;
     this.modalProyectoAbierto = true;
@@ -438,16 +436,14 @@ export class HomeAdminPage implements OnInit {
   guardarProyecto() {
     if (!this.formProyecto.titulo.trim()) return;
     this.guardandoProyecto = true;
-
     const payload: Partial<proyecto> = {
-      titulo:       this.formProyecto.titulo,
-      descripcion:  this.formProyecto.descripcion,
-      cupoMaximo:   this.formProyecto.cupoMaximo,
-      estado:       this.formProyecto.estado,
+      titulo: this.formProyecto.titulo,
+      descripcion: this.formProyecto.descripcion,
+      cupoMaximo: this.formProyecto.cupoMaximo,
+      estado: this.formProyecto.estado,
       fotoProyecto: this.formProyecto.fotoProyecto || null,
-      videoUrl:     this.formProyecto.videoUrl || '',
+      videoUrl: this.formProyecto.videoUrl || '',
     };
-
     if (this.proyectoEditando) {
       this.proyectoService.actualizarProyecto(this.proyectoEditando.id, payload).subscribe({
         next: (actualizado) => {
@@ -457,7 +453,10 @@ export class HomeAdminPage implements OnInit {
           this.mostrarToast('Proyecto actualizado correctamente', 'success');
           this.cerrarModalProyecto();
         },
-        error: () => { this.mostrarToast('Error al actualizar el proyecto', 'danger'); this.guardandoProyecto = false; }
+        error: () => {
+          this.mostrarToast('Error al actualizar el proyecto', 'danger');
+          this.guardandoProyecto = false;
+        }
       });
     } else {
       this.proyectoService.crearProyecto(payload).subscribe({
@@ -467,7 +466,10 @@ export class HomeAdminPage implements OnInit {
           this.mostrarToast('Proyecto creado correctamente', 'success');
           this.cerrarModalProyecto();
         },
-        error: () => { this.mostrarToast('Error al crear el proyecto', 'danger'); this.guardandoProyecto = false; }
+        error: () => {
+          this.mostrarToast('Error al crear el proyecto', 'danger');
+          this.guardandoProyecto = false;
+        }
       });
     }
   }
@@ -524,7 +526,6 @@ export class HomeAdminPage implements OnInit {
     this.usuarioService.eliminarUsuario(id).subscribe({
       next: () => {
         this.usuarios = this.usuarios.filter(u => u.id !== id);
-        // También limpiar del mapa
         this.usuarioIdToAlumnoId.delete(id);
         this.aplicarFiltros();
         this.mostrarToast('Usuario eliminado correctamente', 'success');
@@ -536,8 +537,8 @@ export class HomeAdminPage implements OnInit {
   getIconoPorRol(rol: string): string {
     switch (rol?.toLowerCase()) {
       case 'administrador': return 'shield-checkmark-outline';
-      case 'profesor':      return 'reader-outline';
-      default:              return 'person-outline';
+      case 'profesor': return 'reader-outline';
+      default: return 'person-outline';
     }
   }
 
@@ -574,7 +575,6 @@ export class HomeAdminPage implements OnInit {
   guardarEdicion() {
     if (!this.usuarioEditando) return;
     this.guardandoEdicion = true;
-
     const payload: any = {
       nombreReal: this.formEdicion.nombreReal,
       nombreUsuario: this.formEdicion.nombreUsuario,
@@ -665,11 +665,9 @@ export class HomeAdminPage implements OnInit {
   aplicarCambioMasivoRol() {
     if (this.seleccionadosMasivo.length === 0) return;
     this.guardandoCambioMasivo = true;
-
     const peticiones = this.seleccionadosMasivo.map(id =>
       this.usuarioService.actualizarUsuario(id, { rol: this.rolMasivoDestino })
     );
-
     forkJoin(peticiones).subscribe({
       next: (resultados) => {
         resultados.forEach((actualizado: any) => {
@@ -733,5 +731,37 @@ export class HomeAdminPage implements OnInit {
 
   toggleMostrarTodosProyectos() {
     this.mostrarTodosProyectos = !this.mostrarTodosProyectos;
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // ACTIVIDAD ANTI-AFK
+  // ─────────────────────────────────────────────────────────────
+  cargarRegistrosAfkHoy() {
+    this.loadingAfk = true;
+    this.registroActividadService.getHoy().subscribe({
+      next: (registros) => {
+        const unicos = new Map<number, RegistroActividad>();
+        for (const r of registros) {
+          if (!unicos.has(r.usuarioId)) {
+            unicos.set(r.usuarioId, r);
+          }
+        }
+        this.registrosAfk = Array.from(unicos.values());
+        this.loadingAfk = false;
+      },
+      error: () => {
+        this.loadingAfk = false;
+      }
+    });
+  }
+
+  getNombrePorUsuarioId(usuarioId: number): string {
+    const u = this.usuarios.find(u => u.id === usuarioId);
+    return u?.nombreReal ?? `Usuario #${usuarioId}`;
+  }
+
+  getIconoPorUsuarioId(usuarioId: number): string {
+    const u = this.usuarios.find(u => u.id === usuarioId);
+    return this.getIconoPorRol(u?.rol ?? '');
   }
 }
