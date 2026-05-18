@@ -31,7 +31,7 @@
                     <span class="stat-value">
                       <ion-icon name="school-outline"></ion-icon>
                     </span>
-                    <span class="stat-label">{{ userData.modalidad }}</span>
+                    <span class="stat-label">{{ userData.modalidad || 'Sin modalidad' }}</span>
                   </div>
                 </div>
                 <div class="admin-banner">
@@ -276,4 +276,3 @@
     </ion-content>
   </ng-template>
 </ion-modal>
-

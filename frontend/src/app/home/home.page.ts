@@ -278,7 +278,7 @@ export class HomePage implements OnInit {
         this.misProyectos = misProyectos;
         this.nuevosProyectos = nuevosProyectos;
         this.misProyectosFiltrados = [...misProyectos];
-        this.nuevosProyectosFiltrados = [...nuevosProyectos];
+        this.nuevosProyectosFiltrados = this.ordenarPorEstado(nuevosProyectos);
         this.loadingProyectos = false;
       },
       error: async () => {
@@ -296,20 +296,27 @@ export class HomePage implements OnInit {
     const texto = textoBusqueda ? textoBusqueda.toLowerCase().trim() : '';
     if (!texto) {
       this.misProyectosFiltrados = [...this.misProyectos];
-      this.nuevosProyectosFiltrados = [...this.nuevosProyectos];
+      this.nuevosProyectosFiltrados = this.ordenarPorEstado(this.nuevosProyectos);
       return;
     }
     this.misProyectosFiltrados = this.misProyectos.filter(p =>
       p.titulo.toLowerCase().includes(texto) || p.descripcion?.toLowerCase().includes(texto)
     );
-    this.nuevosProyectosFiltrados = this.nuevosProyectos.filter(p =>
+    this.nuevosProyectosFiltrados = this.ordenarPorEstado(this.nuevosProyectos.filter(p =>
       p.titulo.toLowerCase().includes(texto) || p.descripcion?.toLowerCase().includes(texto)
-    );
+    ));
   }
 
   // ─────────────────────────────────────────────────────────────
   // HELPERS DE PROYECTOS
   // ─────────────────────────────────────────────────────────────
+  private ordenarPorEstado(proyectos: proyecto[]): proyecto[] {
+    const prioridad: Record<string, number> = { 'en curso': 0, 'pausado': 1, 'finalizado': 2 };
+    return [...proyectos].sort((a, b) =>
+      (prioridad[a.estado] ?? 99) - (prioridad[b.estado] ?? 99)
+    );
+  }
+
   getClaseEstado(estado: string): string {
     return 'estado-' + (estado ?? '').replace(/ /g, '-');
   }
@@ -353,7 +360,7 @@ export class HomePage implements OnInit {
     return 'Inscribirse';
   }
 
-async fichar() {
+  async fichar() {
     if (!this.alumnoIdReal) return;
 
     // Obtenemos la sesión para el localStorage
