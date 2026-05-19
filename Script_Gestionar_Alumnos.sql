@@ -114,6 +114,9 @@ CREATE TABLE IF NOT EXISTS asistencia (
     alumno_id INT,
     fecha DATE DEFAULT (CURRENT_DATE),
     presente TINYINT(1) DEFAULT 0,
+    hora_entrada TIME DEFAULT NULL;
+    hora_salida TIME DEFAULT NULL;
+    estado VARCHAR(20) DEFAULT NULL;
     FOREIGN KEY (alumno_id) REFERENCES alumno(id) ON DELETE CASCADE
 );
 
@@ -243,6 +246,5 @@ INSERT IGNORE INTO asistencia (alumno_id, fecha, presente) VALUES
 ALTER TABLE usuario MODIFY COLUMN foto_usuario LONGTEXT;
 ALTER TABLE proyecto MODIFY COLUMN foto_proyecto LONGTEXT;
 ALTER TABLE proyecto ADD COLUMN video_url VARCHAR(500) DEFAULT NULL;
-ALTER TABLE asistencia ADD COLUMN hora_entrada TIME DEFAULT NULL;
-ALTER TABLE asistencia ADD COLUMN hora_salida TIME DEFAULT NULL;
-ALTER TABLE asistencia ADD COLUMN estado VARCHAR(20) DEFAULT NULL;
+DESCRIBE asistencia;
+
