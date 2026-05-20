@@ -20,6 +20,7 @@ import {
   playCircleOutline, pauseCircleOutline, checkmarkCircleOutline,
   imageOutline, timeOutline, logInOutline, logOutOutline, calendarOutline, saveOutline,
   checkmarkDoneCircle,
+  removeCircleOutline, swapHorizontalOutline,
   // ── AFK ──────────────────────────────────────────────────────
   closeCircleOutline, checkmarkDoneCircleOutline,
   chevronUpOutline, chevronDownOutline
@@ -28,6 +29,7 @@ import { alumno } from '../modelos/alumno';
 import { AlumnoService } from '../services/alumno-service';
 import { UsuarioService, Usuario } from '../services/usuario-service';
 import { ProyectoService } from '../services/proyecto-service';
+import { AsignacionService } from '../services/asignacion-service';
 import { AsistenciaService, AsistenciaDTO } from '../services/asistencia-service';
 import { AuthService } from '../services/auth-service';
 import { proyecto, EstadoProyecto } from '../modelos/proyecto';
@@ -116,9 +118,21 @@ export class HomeAdminPage implements OnInit {
   registrosAfk: RegistroActividad[] = [];
   loadingAfk: boolean = true;
   mostrarTodosAfk: boolean = false;
+
+  // ── GESTIÓN ALUMNOS EN PROYECTO ──────────────────────────────
+  modalGestionAlumnosAbierto: boolean = false;
+  proyectoGestionando: proyecto | null = null;
+  alumnosInscritos: Usuario[] = [];
+  alumnosDisponibles: Usuario[] = [];
+  alumnosInscritosFiltrados: Usuario[] = [];
+  alumnosDisponiblesFiltrados: Usuario[] = [];
+  busquedaInscritos: string = '';
+  busquedaDisponibles: string = '';
+  loadingGestion: boolean = false;
   private asistenciaService = inject(AsistenciaService);
   private authService = inject(AuthService);
   private registroActividadService = inject(RegistroActividadService);
+  private asignacionService = inject(AsignacionService);
 
   constructor(
     private alumnoService: AlumnoService,
@@ -137,6 +151,7 @@ export class HomeAdminPage implements OnInit {
       playCircleOutline, pauseCircleOutline, checkmarkCircleOutline,
       imageOutline, timeOutline, logInOutline, logOutOutline, calendarOutline, saveOutline,
       checkmarkDoneCircle,
+      removeCircleOutline, swapHorizontalOutline,
       // ── AFK ────────────────────────────────────────────────
       closeCircleOutline, checkmarkDoneCircleOutline,
       chevronUpOutline, chevronDownOutline
@@ -763,5 +778,96 @@ export class HomeAdminPage implements OnInit {
   getIconoPorUsuarioId(usuarioId: number): string {
     const u = this.usuarios.find(u => u.id === usuarioId);
     return this.getIconoPorRol(u?.rol ?? '');
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // GESTIÓN ALUMNOS EN PROYECTO
+  // ─────────────────────────────────────────────────────────────
+  abrirModalGestionAlumnos(p: proyecto) {
+    this.proyectoGestionando = p;
+    this.busquedaInscritos = '';
+    this.busquedaDisponibles = '';
+    this.alumnosInscritos = [];
+    this.alumnosDisponibles = [];
+    this.alumnosInscritosFiltrados = [];
+    this.alumnosDisponiblesFiltrados = [];
+    this.loadingGestion = true;
+    this.modalGestionAlumnosAbierto = true;
+
+    this.asignacionService.getAlumnosPorProyecto(p.id).subscribe({
+      next: (inscritos) => {
+        this.alumnosInscritos = inscritos;
+        this.alumnosInscritosFiltrados = [...inscritos];
+        const inscritosIds = new Set(inscritos.map((u: Usuario) => u.id));
+        this.alumnosDisponibles = this.usuarios.filter(
+          u => u.rol?.toLowerCase() === 'alumno' && !inscritosIds.has(u.id)
+        );
+        this.alumnosDisponiblesFiltrados = [...this.alumnosDisponibles];
+        this.loadingGestion = false;
+      },
+      error: () => {
+        this.mostrarToast('Error al cargar los alumnos del proyecto', 'danger');
+        this.loadingGestion = false;
+      }
+    });
+  }
+
+  cerrarModalGestionAlumnos() {
+    this.modalGestionAlumnosAbierto = false;
+    this.proyectoGestionando = null;
+  }
+
+  filtrarInscritos() {
+    const q = this.busquedaInscritos.toLowerCase().trim();
+    this.alumnosInscritosFiltrados = q
+      ? this.alumnosInscritos.filter(u =>
+        u.nombreReal?.toLowerCase().includes(q) || u.id?.toString().includes(q))
+      : [...this.alumnosInscritos];
+  }
+
+  filtrarDisponibles() {
+    const q = this.busquedaDisponibles.toLowerCase().trim();
+    this.alumnosDisponiblesFiltrados = q
+      ? this.alumnosDisponibles.filter(u =>
+        u.nombreReal?.toLowerCase().includes(q) || u.id?.toString().includes(q))
+      : [...this.alumnosDisponibles];
+  }
+
+  inscribirAlumno(usuario: Usuario) {
+    if (!this.proyectoGestionando) return;
+    if (this.alumnosInscritos.length >= this.proyectoGestionando.cupoMaximo) {
+      this.mostrarToast('El proyecto ha alcanzado su cupo máximo', 'warning');
+      return;
+    }
+
+    this.asignacionService.inscribir(usuario.id, this.proyectoGestionando.id).subscribe({
+      next: () => {
+        this.alumnosInscritos = [...this.alumnosInscritos, usuario];
+        this.alumnosDisponibles = this.alumnosDisponibles.filter(u => u.id !== usuario.id);
+        this.filtrarInscritos();
+        this.filtrarDisponibles();
+        this.mostrarToast(`${usuario.nombreReal} inscrito correctamente`, 'success');
+      },
+      error: (err) => {
+        const msg = err?.error?.message ?? 'Error al inscribir el alumno';
+        this.mostrarToast(msg, 'danger');
+      }
+    });
+  }
+
+  desinscribirAlumno(usuario: Usuario) {
+    if (!this.proyectoGestionando) return;
+
+    this.asignacionService.salir(usuario.id, this.proyectoGestionando.id).subscribe({
+      next: () => {
+        this.alumnosInscritos = this.alumnosInscritos.filter(u => u.id !== usuario.id);
+        this.alumnosDisponibles = [...this.alumnosDisponibles, usuario]
+          .sort((a, b) => (a.nombreReal ?? '').localeCompare(b.nombreReal ?? ''));
+        this.filtrarInscritos();
+        this.filtrarDisponibles();
+        this.mostrarToast(`${usuario.nombreReal} eliminado del proyecto`, 'success');
+      },
+      error: () => this.mostrarToast('Error al eliminar el alumno del proyecto', 'danger')
+    });
   }
 }
