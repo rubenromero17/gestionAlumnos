@@ -17,6 +17,7 @@ import {
   peopleOutline, folderOpenOutline, searchOutline,
   calendarOutline, saveOutline,
   checkboxOutline, checkmarkOutline, checkmarkCircleOutline,
+  checkbox, squareOutline,
   hourglassOutline, playCircleOutline,
   trashOutline, personOutline
 } from 'ionicons/icons';
@@ -99,6 +100,7 @@ export class HomePage implements OnInit {
       peopleOutline, folderOpenOutline, searchOutline,
       calendarOutline, saveOutline,
       checkboxOutline, checkmarkOutline, checkmarkCircleOutline,
+      checkbox, squareOutline,
       hourglassOutline, playCircleOutline,
       trashOutline, personOutline
     });

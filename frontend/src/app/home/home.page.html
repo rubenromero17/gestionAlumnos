@@ -287,6 +287,49 @@
               <div class="progress-track" style="margin-top: 12px;">
                 <div class="progress-fill" [style.width.%]="getPorcentajeCupo(proyectoSeleccionado)"></div>
               </div>
+
+              <!-- Barra de progreso de tareas (solo alumnos inscritos) -->
+              <ng-container *ngIf="esProyectoInscrito && (tareasProyecto.length > 0 || loadingTareas)">
+
+                <div class="tareas-divider"></div>
+
+                <div class="tareas-header">
+                  <span class="tareas-label-left">
+                    <ion-icon name="checkbox-outline"></ion-icon>
+                    Mis tareas
+                  </span>
+                  <span class="tareas-counter" *ngIf="tareasProyecto.length > 0">
+                    {{ tareasCompletadasCount() }} / {{ tareasProyecto.length }}
+                  </span>
+                </div>
+
+                <!-- Barra -->
+                <div class="tareas-progress-track" *ngIf="tareasProyecto.length > 0">
+                  <div class="tareas-progress-fill" [style.width.%]="tareasProgresoPct()"></div>
+                </div>
+                <div class="tareas-pct" *ngIf="tareasProyecto.length > 0">{{ tareasProgresoPct() }}% completado</div>
+
+                <!-- Loading -->
+                <div class="tareas-loading" *ngIf="loadingTareas">
+                  <ion-icon name="hourglass-outline"></ion-icon>
+                  Cargando tareas...
+                </div>
+
+                <!-- Lista -->
+                <div class="tareas-lista" *ngIf="!loadingTareas && tareasProyecto.length > 0">
+                  <div
+                    *ngFor="let tarea of tareasProyecto"
+                    class="tarea-item"
+                    [class.tarea-item--done]="tarea.completada"
+                    (click)="toggleTarea(tarea)">
+                    <div class="tarea-check">
+                      <ion-icon [name]="tarea.completada ? 'checkbox' : 'square-outline'"></ion-icon>
+                    </div>
+                    <span class="tarea-titulo">{{ tarea.titulo }}</span>
+                  </div>
+                </div>
+
+              </ng-container>
             </div>
 
             <div class="team-section" style="margin-top: 24px; margin-bottom: 24px;">

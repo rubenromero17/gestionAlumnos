@@ -807,6 +807,11 @@ export class HomeAdminPage implements OnInit {
     }, 50);
   }
 
+  /** TrackBy por índice para evitar que el ngFor destruya los inputs al escribir */
+  trackByIndex(index: number): number {
+    return index;
+  }
+
   /** Elimina la fila en el índice indicado */
   quitarTarea(index: number) {
     this.formTareas.splice(index, 1);

@@ -592,7 +592,7 @@
         </label>
 
         <div class="tareas-lista" cdkDropList (cdkDropListDropped)="reordenarTarea($event)">
-          <div class="tarea-row" *ngFor="let t of formTareas; let i = index" cdkDrag>
+          <div class="tarea-row" *ngFor="let t of formTareas; let i = index; trackBy: trackByIndex" cdkDrag>
             <div class="tarea-drag-handle" cdkDragHandle>
               <ion-icon name="reorder-three-outline"></ion-icon>
             </div>
