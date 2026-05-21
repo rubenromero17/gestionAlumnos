@@ -38,7 +38,7 @@ import { forkJoin } from 'rxjs';
   ]
 })
 export class ProfilePage implements OnInit {
-
+  isDarkMode = false;
   isPasswordModalOpen = false;
   fotoUrl: string | null = null;
   numProyectos: number = 0;
@@ -90,6 +90,8 @@ export class ProfilePage implements OnInit {
   }
 
   ngOnInit(): void {
+    this.isDarkMode = localStorage.getItem('theme') === 'dark';
+    this.applyTheme(this.isDarkMode);
     const sesion = this.authService.obtenerSesion();
     const fotoKey = `profile_foto_${sesion?.id}`;
     const savedFoto = localStorage.getItem(fotoKey);
@@ -462,5 +464,14 @@ export class ProfilePage implements OnInit {
     if (encontrada) {
       this.userData.modalidad = encontrada.nombre;
     }
+  }
+  toggleDarkMode(event: any) {
+    this.isDarkMode = event.detail.checked;
+    this.applyTheme(this.isDarkMode);
+    localStorage.setItem('theme', this.isDarkMode ? 'dark' : 'light');
+  }
+
+  private applyTheme(dark: boolean) {
+    document.documentElement.classList.toggle('ion-palette-dark', dark);
   }
 }

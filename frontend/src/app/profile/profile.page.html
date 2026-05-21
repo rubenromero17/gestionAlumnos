@@ -68,6 +68,16 @@
                   <ion-row>
                     <ion-col size="12" size-md="6">
                       <ion-item class="custom-input">
+                        <ion-icon name="moon-outline" slot="start"></ion-icon>
+                        <ion-label>Modo oscuro</ion-label>
+                        <ion-toggle slot="end"
+                                    [checked]="isDarkMode"
+                                    (ionChange)="toggleDarkMode($event)">
+                        </ion-toggle>
+                      </ion-item>
+                    </ion-col>
+                    <ion-col size="12" size-md="6">
+                      <ion-item class="custom-input">
                         <ion-input label="Nombre Real" labelPlacement="stacked" [(ngModel)]="userData.nombre_real"></ion-input>
                       </ion-item>
                     </ion-col>

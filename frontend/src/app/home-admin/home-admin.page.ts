@@ -20,7 +20,7 @@ import {
   playCircleOutline, pauseCircleOutline, checkmarkCircleOutline,
   imageOutline, timeOutline, logInOutline, logOutOutline, calendarOutline, saveOutline,
   checkmarkDoneCircle,
-  removeCircleOutline, swapHorizontalOutline,
+  reorderThreeOutline, informationCircleOutline,
   // ── AFK ──────────────────────────────────────────────────────
   closeCircleOutline, checkmarkDoneCircleOutline,
   chevronUpOutline, chevronDownOutline
@@ -29,13 +29,13 @@ import { alumno } from '../modelos/alumno';
 import { AlumnoService } from '../services/alumno-service';
 import { UsuarioService, Usuario } from '../services/usuario-service';
 import { ProyectoService } from '../services/proyecto-service';
-import { AsignacionService } from '../services/asignacion-service';
 import { AsistenciaService, AsistenciaDTO } from '../services/asistencia-service';
 import { AuthService } from '../services/auth-service';
 import { proyecto, EstadoProyecto } from '../modelos/proyecto';
 import { HeaderComponent } from '../components/header/header.component';
 import { forkJoin } from 'rxjs';
 import { RegistroActividad, RegistroActividadService } from "../services/registro-actividad-service";
+import {TareaService} from "../services/tarea-service";
 // ── AFK ────────────────────────────────────────────────────────
 
 @Component({
@@ -119,20 +119,13 @@ export class HomeAdminPage implements OnInit {
   loadingAfk: boolean = true;
   mostrarTodosAfk: boolean = false;
 
-  // ── GESTIÓN ALUMNOS EN PROYECTO ──────────────────────────────
-  modalGestionAlumnosAbierto: boolean = false;
-  proyectoGestionando: proyecto | null = null;
-  alumnosInscritos: Usuario[] = [];
-  alumnosDisponibles: Usuario[] = [];
-  alumnosInscritosFiltrados: Usuario[] = [];
-  alumnosDisponiblesFiltrados: Usuario[] = [];
-  busquedaInscritos: string = '';
-  busquedaDisponibles: string = '';
-  loadingGestion: boolean = false;
+  // ── TAREAS DE PROYECTO (admin) ────────────────────────────────────────────
+  formTareas: string[] = [];          // títulos editables en el modal
+  guardandoTareas: boolean = false;
   private asistenciaService = inject(AsistenciaService);
   private authService = inject(AuthService);
   private registroActividadService = inject(RegistroActividadService);
-  private asignacionService = inject(AsignacionService);
+  private tareaService = inject(TareaService);
 
   constructor(
     private alumnoService: AlumnoService,
@@ -151,7 +144,7 @@ export class HomeAdminPage implements OnInit {
       playCircleOutline, pauseCircleOutline, checkmarkCircleOutline,
       imageOutline, timeOutline, logInOutline, logOutOutline, calendarOutline, saveOutline,
       checkmarkDoneCircle,
-      removeCircleOutline, swapHorizontalOutline,
+      reorderThreeOutline, informationCircleOutline,
       // ── AFK ────────────────────────────────────────────────
       closeCircleOutline, checkmarkDoneCircleOutline,
       chevronUpOutline, chevronDownOutline
@@ -438,14 +431,17 @@ export class HomeAdminPage implements OnInit {
       fotoProyecto: p?.fotoProyecto || null,
       videoUrl: p?.videoUrl || ''
     };
+    this.formTareas = [];
     this.guardandoProyecto = false;
     this.modalProyectoAbierto = true;
+    if (p?.id) this.cargarTareasEnForm(p.id);
   }
 
   cerrarModalProyecto() {
     this.modalProyectoAbierto = false;
     this.proyectoEditando = null;
     this.guardandoProyecto = false;
+    this.formTareas = [];
   }
 
   guardarProyecto() {
@@ -461,10 +457,11 @@ export class HomeAdminPage implements OnInit {
     };
     if (this.proyectoEditando) {
       this.proyectoService.actualizarProyecto(this.proyectoEditando.id, payload).subscribe({
-        next: (actualizado) => {
+        next: async (actualizado) => {
           const idx = this.proyectos.findIndex(p => p.id === this.proyectoEditando!.id);
           if (idx !== -1) this.proyectos[idx] = { ...this.proyectos[idx], ...actualizado };
           this.aplicarFiltrosProyectos();
+          await this.guardarTareasDelProyecto(actualizado.id).catch(() => {});
           this.mostrarToast('Proyecto actualizado correctamente', 'success');
           this.cerrarModalProyecto();
         },
@@ -475,9 +472,10 @@ export class HomeAdminPage implements OnInit {
       });
     } else {
       this.proyectoService.crearProyecto(payload).subscribe({
-        next: (nuevo) => {
+        next: async (nuevo) => {
           this.proyectos.unshift(nuevo);
           this.aplicarFiltrosProyectos();
+          await this.guardarTareasDelProyecto(nuevo.id).catch(() => {});
           this.mostrarToast('Proyecto creado correctamente', 'success');
           this.cerrarModalProyecto();
         },
@@ -781,93 +779,55 @@ export class HomeAdminPage implements OnInit {
   }
 
   // ─────────────────────────────────────────────────────────────
-  // GESTIÓN ALUMNOS EN PROYECTO
+  // TAREAS DE PROYECTO — ADMIN
   // ─────────────────────────────────────────────────────────────
-  abrirModalGestionAlumnos(p: proyecto) {
-    this.proyectoGestionando = p;
-    this.busquedaInscritos = '';
-    this.busquedaDisponibles = '';
-    this.alumnosInscritos = [];
-    this.alumnosDisponibles = [];
-    this.alumnosInscritosFiltrados = [];
-    this.alumnosDisponiblesFiltrados = [];
-    this.loadingGestion = true;
-    this.modalGestionAlumnosAbierto = true;
 
-    this.asignacionService.getAlumnosPorProyecto(p.id).subscribe({
-      next: (inscritos) => {
-        this.alumnosInscritos = inscritos;
-        this.alumnosInscritosFiltrados = [...inscritos];
-        const inscritosIds = new Set(inscritos.map((u: Usuario) => u.id));
-        this.alumnosDisponibles = this.usuarios.filter(
-          u => u.rol?.toLowerCase() === 'alumno' && !inscritosIds.has(u.id)
-        );
-        this.alumnosDisponiblesFiltrados = [...this.alumnosDisponibles];
-        this.loadingGestion = false;
+  /** Carga las tareas existentes al abrir el modal de edición */
+  private cargarTareasEnForm(proyectoId: number) {
+    this.tareaService.getTareasPorProyecto(proyectoId).subscribe({
+      next: (tareas) => {
+        this.formTareas = tareas.map(t => t.titulo);
       },
-      error: () => {
-        this.mostrarToast('Error al cargar los alumnos del proyecto', 'danger');
-        this.loadingGestion = false;
-      }
+      error: () => this.formTareas = []
     });
   }
 
-  cerrarModalGestionAlumnos() {
-    this.modalGestionAlumnosAbierto = false;
-    this.proyectoGestionando = null;
-  }
-
-  filtrarInscritos() {
-    const q = this.busquedaInscritos.toLowerCase().trim();
-    this.alumnosInscritosFiltrados = q
-      ? this.alumnosInscritos.filter(u =>
-        u.nombreReal?.toLowerCase().includes(q) || u.id?.toString().includes(q))
-      : [...this.alumnosInscritos];
-  }
-
-  filtrarDisponibles() {
-    const q = this.busquedaDisponibles.toLowerCase().trim();
-    this.alumnosDisponiblesFiltrados = q
-      ? this.alumnosDisponibles.filter(u =>
-        u.nombreReal?.toLowerCase().includes(q) || u.id?.toString().includes(q))
-      : [...this.alumnosDisponibles];
-  }
-
-  inscribirAlumno(usuario: Usuario) {
-    if (!this.proyectoGestionando) return;
-    if (this.alumnosInscritos.length >= this.proyectoGestionando.cupoMaximo) {
-      this.mostrarToast('El proyecto ha alcanzado su cupo máximo', 'warning');
-      return;
+  /** Añade una fila vacía (o después del índice indicado) */
+  agregarTarea(despuesDeIndex?: number) {
+    if (despuesDeIndex !== undefined) {
+      this.formTareas.splice(despuesDeIndex + 1, 0, '');
+    } else {
+      this.formTareas.push('');
     }
-
-    this.asignacionService.inscribir(usuario.id, this.proyectoGestionando.id).subscribe({
-      next: () => {
-        this.alumnosInscritos = [...this.alumnosInscritos, usuario];
-        this.alumnosDisponibles = this.alumnosDisponibles.filter(u => u.id !== usuario.id);
-        this.filtrarInscritos();
-        this.filtrarDisponibles();
-        this.mostrarToast(`${usuario.nombreReal} inscrito correctamente`, 'success');
-      },
-      error: (err) => {
-        const msg = err?.error?.message ?? 'Error al inscribir el alumno';
-        this.mostrarToast(msg, 'danger');
-      }
-    });
+    // Focus al nuevo input en el siguiente tick
+    setTimeout(() => {
+      const inputs = document.querySelectorAll<HTMLInputElement>('.tarea-input');
+      const target = despuesDeIndex !== undefined ? despuesDeIndex + 1 : this.formTareas.length - 1;
+      inputs[target]?.focus();
+    }, 50);
   }
 
-  desinscribirAlumno(usuario: Usuario) {
-    if (!this.proyectoGestionando) return;
+  /** Elimina la fila en el índice indicado */
+  quitarTarea(index: number) {
+    this.formTareas.splice(index, 1);
+  }
 
-    this.asignacionService.salir(usuario.id, this.proyectoGestionando.id).subscribe({
-      next: () => {
-        this.alumnosInscritos = this.alumnosInscritos.filter(u => u.id !== usuario.id);
-        this.alumnosDisponibles = [...this.alumnosDisponibles, usuario]
-          .sort((a, b) => (a.nombreReal ?? '').localeCompare(b.nombreReal ?? ''));
-        this.filtrarInscritos();
-        this.filtrarDisponibles();
-        this.mostrarToast(`${usuario.nombreReal} eliminado del proyecto`, 'success');
-      },
-      error: () => this.mostrarToast('Error al eliminar el alumno del proyecto', 'danger')
+  /** Drag & drop reorder (CDK) */
+  reordenarTarea(event: any) {
+    const { previousIndex, currentIndex } = event;
+    const item = this.formTareas.splice(previousIndex, 1)[0];
+    this.formTareas.splice(currentIndex, 0, item);
+  }
+
+  /** Guarda las tareas al guardar el proyecto */
+  private guardarTareasDelProyecto(proyectoId: number): Promise<void> {
+    const titulos = this.formTareas.filter(t => t.trim() !== '');
+    if (titulos.length === 0) return Promise.resolve();
+    return new Promise((resolve, reject) => {
+      this.tareaService.guardarTareas(proyectoId, titulos).subscribe({
+        next: () => resolve(),
+        error: () => reject()
+      });
     });
   }
 }

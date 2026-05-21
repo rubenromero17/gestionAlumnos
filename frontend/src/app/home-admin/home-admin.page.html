@@ -266,9 +266,6 @@
                 {{ p.estado }}
               </div>
               <div class="usuario-acciones">
-                <ion-button fill="clear" size="small" class="accion-btn alumnos-btn" (click)="abrirModalGestionAlumnos(p)" title="Gestionar alumnos">
-                  <ion-icon name="people-outline" slot="icon-only"></ion-icon>
-                </ion-button>
                 <ion-button fill="clear" size="small" class="accion-btn edit-btn" (click)="abrirModalProyecto(p)">
                   <ion-icon name="pencil-outline" slot="icon-only"></ion-icon>
                 </ion-button>
@@ -585,6 +582,48 @@
         <label class="form-label">URL del video explicativo</label>
         <input class="form-input" type="url" [(ngModel)]="formProyecto.videoUrl" placeholder="https://youtube.com/..." />
       </div>
+
+      <!-- ── TAREAS DEL PROYECTO ── -->
+      <div class="form-group tareas-admin-section" *ngIf="proyectoEditando">
+        <label class="form-label tareas-label">
+          <ion-icon name="checkbox-outline"></ion-icon>
+          Tareas del proyecto
+          <span class="tareas-count-badge">{{ formTareas.length }}</span>
+        </label>
+
+        <div class="tareas-lista" cdkDropList (cdkDropListDropped)="reordenarTarea($event)">
+          <div class="tarea-row" *ngFor="let t of formTareas; let i = index" cdkDrag>
+            <div class="tarea-drag-handle" cdkDragHandle>
+              <ion-icon name="reorder-three-outline"></ion-icon>
+            </div>
+            <span class="tarea-num">{{ i + 1 }}</span>
+            <input
+              class="form-input tarea-input"
+              type="text"
+              [(ngModel)]="formTareas[i]"
+              placeholder="Descripción de la tarea..."
+              (keydown.enter)="agregarTarea(i)" />
+            <button class="tarea-quitar-btn" (click)="quitarTarea(i)" title="Eliminar tarea">
+              <ion-icon name="close-circle-outline"></ion-icon>
+            </button>
+          </div>
+
+          <div class="tareas-vacio" *ngIf="formTareas.length === 0">
+            <ion-icon name="checkbox-outline"></ion-icon>
+            <span>Sin tareas aún. Añade la primera.</span>
+          </div>
+        </div>
+
+        <button class="btn-añadir-tarea" (click)="agregarTarea()">
+          <ion-icon name="add-outline"></ion-icon>
+          Añadir tarea
+        </button>
+      </div>
+
+      <div class="tareas-admin-aviso" *ngIf="!proyectoEditando">
+        <ion-icon name="information-circle-outline"></ion-icon>
+        Podrás añadir tareas después de crear el proyecto.
+      </div>
     </div>
 
     <div class="modal-footer">
@@ -594,140 +633,6 @@
         <ion-icon name="hourglass-outline" *ngIf="guardandoProyecto"></ion-icon>
         {{ guardandoProyecto ? 'Guardando...' : (proyectoEditando ? 'Guardar cambios' : 'Crear proyecto') }}
       </button>
-    </div>
-
-  </div>
-</div>
-
-<!-- ========================================================= -->
-<!-- MODAL GESTIÓN DE ALUMNOS EN PROYECTO                      -->
-<!-- ========================================================= -->
-<div class="modal-overlay" *ngIf="modalGestionAlumnosAbierto" (click)="cerrarModalGestionAlumnos()">
-  <div class="modal-card modal-gestion-alumnos" (click)="$event.stopPropagation()">
-
-    <div class="modal-header">
-      <div class="modal-header-info">
-        <div class="modal-avatar avatar-proyecto">
-          <ion-icon name="people-outline"></ion-icon>
-        </div>
-        <div>
-          <h2 class="modal-title">Gestionar alumnos</h2>
-          <span class="modal-subtitle">{{ proyectoGestionando?.titulo }}</span>
-        </div>
-      </div>
-      <ion-button fill="clear" class="modal-close-btn" (click)="cerrarModalGestionAlumnos()">
-        <ion-icon name="close-outline" slot="icon-only"></ion-icon>
-      </ion-button>
-    </div>
-
-    <!-- Cupo -->
-    <div class="gestion-cupo-bar">
-      <ion-icon name="people-outline"></ion-icon>
-      <span>
-        <strong>{{ alumnosInscritos.length }}</strong> / {{ proyectoGestionando?.cupoMaximo }} plazas ocupadas
-      </span>
-      <div class="cupo-progress-track">
-        <div class="cupo-progress-fill"
-             [style.width.%]="proyectoGestionando ? (alumnosInscritos.length / proyectoGestionando.cupoMaximo) * 100 : 0"
-             [class.cupo-lleno]="proyectoGestionando && alumnosInscritos.length >= proyectoGestionando.cupoMaximo">
-        </div>
-      </div>
-    </div>
-
-    <div class="modal-body gestion-body">
-
-      <!-- ── COLUMNA IZQUIERDA: inscritos ── -->
-      <div class="gestion-col">
-        <div class="gestion-col-header">
-          <ion-icon name="checkmark-circle-outline" class="col-icon col-icon-in"></ion-icon>
-          <span class="gestion-col-title">Inscritos ({{ alumnosInscritos.length }})</span>
-        </div>
-
-        <div class="masivo-search-wrapper" style="margin-bottom: 8px;">
-          <ion-icon name="search-outline" class="masivo-search-icon"></ion-icon>
-          <input class="masivo-search-input" type="text" placeholder="Buscar inscrito..."
-                 [(ngModel)]="busquedaInscritos" (input)="filtrarInscritos()" />
-          <button class="masivo-search-clear" *ngIf="busquedaInscritos" (click)="busquedaInscritos=''; filtrarInscritos()">
-            <ion-icon name="close-outline"></ion-icon>
-          </button>
-        </div>
-
-        <div class="gestion-lista">
-          <div class="gestion-item gestion-item-in"
-               *ngFor="let u of alumnosInscritosFiltrados"
-               (click)="desinscribirAlumno(u)">
-            <div class="usuario-avatar avatar-alumno">
-              <ion-icon name="person-outline"></ion-icon>
-            </div>
-            <div class="usuario-info">
-              <span class="usuario-nombre">{{ u.nombreReal }} </span>
-              <span class="usuario-id">ID: {{ u.id }}</span>
-            </div>
-            <div class="gestion-accion gestion-quitar">
-              <ion-icon name="remove-circle-outline"></ion-icon>
-            </div>
-          </div>
-          <div class="masivo-vacio" *ngIf="alumnosInscritosFiltrados.length === 0 && !loadingGestion">
-            <ion-icon name="people-outline"></ion-icon>
-            <p>{{ busquedaInscritos ? 'Sin resultados' : 'Nadie inscrito aún' }}</p>
-          </div>
-          <div class="gestion-loading" *ngIf="loadingGestion">
-            <ion-icon name="hourglass-outline"></ion-icon>
-            <span>Cargando...</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── DIVISOR ── -->
-      <div class="gestion-divisor">
-        <div class="gestion-divisor-line"></div>
-        <ion-icon name="swap-horizontal-outline" class="gestion-divisor-icon"></ion-icon>
-        <div class="gestion-divisor-line"></div>
-      </div>
-
-      <!-- ── COLUMNA DERECHA: disponibles ── -->
-      <div class="gestion-col">
-        <div class="gestion-col-header">
-          <ion-icon name="add-circle-outline" class="col-icon col-icon-out"></ion-icon>
-          <span class="gestion-col-title">Disponibles ({{ alumnosDisponibles.length }})</span>
-        </div>
-
-        <div class="masivo-search-wrapper" style="margin-bottom: 8px;">
-          <ion-icon name="search-outline" class="masivo-search-icon"></ion-icon>
-          <input class="masivo-search-input" type="text" placeholder="Buscar alumno..."
-                 [(ngModel)]="busquedaDisponibles" (input)="filtrarDisponibles()" />
-          <button class="masivo-search-clear" *ngIf="busquedaDisponibles" (click)="busquedaDisponibles=''; filtrarDisponibles()">
-            <ion-icon name="close-outline"></ion-icon>
-          </button>
-        </div>
-
-        <div class="gestion-lista">
-          <div class="gestion-item gestion-item-out"
-               *ngFor="let u of alumnosDisponiblesFiltrados"
-               [class.gestion-item-disabled]="proyectoGestionando && alumnosInscritos.length >= proyectoGestionando.cupoMaximo"
-               (click)="inscribirAlumno(u)">
-            <div class="usuario-avatar avatar-alumno">
-              <ion-icon name="person-outline"></ion-icon>
-            </div>
-            <div class="usuario-info">
-              <span class="usuario-nombre">{{ u.nombreReal }}</span>
-              <span class="usuario-id">ID: {{ u.id }}</span>
-            </div>
-            <div class="gestion-accion gestion-añadir">
-              <ion-icon name="add-circle-outline"></ion-icon>
-            </div>
-          </div>
-          <div class="masivo-vacio" *ngIf="alumnosDisponiblesFiltrados.length === 0 && !loadingGestion">
-            <ion-icon name="checkmark-done-circle-outline"></ion-icon>
-            <p>{{ busquedaDisponibles ? 'Sin resultados' : 'Todos inscritos' }}</p>
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-    <div class="modal-footer">
-      <button class="btn-cancelar" (click)="cerrarModalGestionAlumnos()">Cerrar</button>
     </div>
 
   </div>

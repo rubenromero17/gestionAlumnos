@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/comentario")
@@ -16,24 +17,35 @@ public class ComentarioController {
 
     private final ComentarioService comentarioService;
 
+    /** GET /api/comentario/proyecto/{proyectoId} */
+    @GetMapping("/proyecto/{proyectoId}")
+    public ResponseEntity<List<ComentarioDTO>> getByProyecto(@PathVariable Long proyectoId) {
+        return ResponseEntity.ok(comentarioService.getComentariosPorProyecto(proyectoId));
+    }
+
+    /**
+     * POST /api/comentario
+     * Body: { "proyectoId": 1, "usuarioId": 3, "texto": "Hola!" }
+     */
     @PostMapping
-    public ResponseEntity<ComentarioDTO> guardar(@RequestBody ComentarioDTO dto) {
-        return new ResponseEntity<>(comentarioService.crearComentario(dto), HttpStatus.CREATED);
+    public ResponseEntity<ComentarioDTO> crear(@RequestBody Map<String, Object> body) {
+        Long   proyectoId = Long.valueOf(body.get("proyectoId").toString());
+        Long   usuarioId  = Long.valueOf(body.get("usuarioId").toString());
+        String texto      = body.get("texto").toString();
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(comentarioService.crear(proyectoId, usuarioId, texto));
     }
 
-    @GetMapping
-    public List<ComentarioDTO> listar() {
-        return comentarioService.obtenerTodos();
-    }
-
-    @GetMapping("/{id}")
-    public ComentarioDTO buscar(@PathVariable Long id) {
-        return comentarioService.obtenerPorId(id);
-    }
-
+    /**
+     * DELETE /api/comentario/{id}
+     * Body: { "usuarioId": 3 }
+     */
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void borrar(@PathVariable Long id) {
-        comentarioService.eliminarComentario(id);
+    public ResponseEntity<Void> eliminar(
+            @PathVariable Long id,
+            @RequestBody Map<String, Object> body) {
+        Long usuarioId = Long.valueOf(body.get("usuarioId").toString());
+        comentarioService.eliminar(id, usuarioId);
+        return ResponseEntity.noContent().build();
     }
 }

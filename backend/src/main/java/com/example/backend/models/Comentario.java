@@ -2,37 +2,28 @@ package com.example.backend.models;
 
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@EqualsAndHashCode
-@ToString
-@NoArgsConstructor
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor
 @Entity
-@Table(name="comentario", schema = "")
-
+@Table(name = "comentario")
 public class Comentario {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "proyecto_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "proyecto_id", nullable = false)
     private Proyecto proyecto;
 
-    @ManyToOne
-    @JoinColumn(name = "usuario_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
 
     @Column(nullable = false, length = 500)
     private String texto;
 
-    @Column(name = "fecha")
+    @Column(nullable = false)
     private LocalDateTime fecha = LocalDateTime.now();
 }

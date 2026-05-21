@@ -15,7 +15,7 @@ $radius-input: 12px;
 
 // ── BASE ──────────────────────────────────────────────────────────────────────
 .home-wrapper {
-  background-color: $bg-app;
+  background: var(--bg-page);
   min-height: 100%;
   padding: 20px 0;
 }
@@ -331,6 +331,8 @@ $radius-input: 12px;
   transition: all 0.3s ease;
   border-radius: 15px;
   &:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
+  background: var(--bg-card);
+  color: var(--text-primary);
 }
 
 // ── STATUS ────────────────────────────────────────────────────────────────────
@@ -1365,190 +1367,157 @@ $radius-input: 12px;
 }
 
 
-// ─── BOTÓN GESTIONAR ALUMNOS EN PROYECTO ─────────────────────────────────────
-.accion-btn.alumnos-btn {
-  --color: #764ba2;
-  &:hover { --color: #5a3480; }
+// ─── TAREAS DE PROYECTO (admin modal) ────────────────────────────────────────
+
+.tareas-admin-section {
+  margin-top: 4px;
 }
 
-// ─── MODAL GESTIÓN DE ALUMNOS ────────────────────────────────────────────────
-.modal-gestion-alumnos {
-  width: min(860px, 96vw);
-  max-height: 88vh;
-}
-
-// Barra de cupo
-.gestion-cupo-bar {
+.tareas-label {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 24px 0;
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.6);
+  gap: 6px;
 
-  ion-icon { font-size: 18px; color: #a78bfa; }
+  ion-icon { font-size: 16px; color: #a78bfa; }
 
-  strong { color: #ffffff; }
-
-  .cupo-progress-track {
-    flex: 1;
-    height: 6px;
-    background: rgba(0, 0, 0, 0.08);
+  .tareas-count-badge {
+    margin-left: auto;
+    background: rgba(118, 75, 162, 0.15);
+    color: #a78bfa;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 1px 8px;
     border-radius: 99px;
-    overflow: hidden;
-
-    .cupo-progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #764ba2, #a78bfa);
-      border-radius: 99px;
-      transition: width 0.4s ease;
-
-      &.cupo-lleno { background: linear-gradient(90deg, #eb445a, #ff6b8a); }
-    }
   }
 }
 
-// Body a dos columnas
-.gestion-body {
-  display: flex;
-  gap: 0;
-  padding: 16px 24px;
-  min-height: 340px;
-}
-
-// Divisor central
-.gestion-divisor {
+.tareas-lista {
   display: flex;
   flex-direction: column;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.tarea-row {
+  display: flex;
   align-items: center;
   gap: 8px;
-  padding: 0 12px;
-  padding-top: 42px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  padding: 6px 8px;
+  transition: border-color 0.15s;
 
-  .gestion-divisor-line {
-    flex: 1;
-    width: 1px;
-    background: rgba(0, 0, 0, 0.08);
+  &:focus-within {
+    border-color: rgba(118, 75, 162, 0.5);
   }
 
-  .gestion-divisor-icon {
-    font-size: 20px;
-    color: rgba(255, 255, 255, 0.35);
-    opacity: 1;
+  // CDK drag
+  &.cdk-drag-preview {
+    box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+    border-color: #764ba2;
+    opacity: 0.95;
   }
+  &.cdk-drag-placeholder { opacity: 0.25; }
+  &.cdk-drag-animating   { transition: transform 200ms ease; }
 }
 
-// Columna
-.gestion-col {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 0;
-
-  .gestion-col-header {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-bottom: 4px;
-
-    .gestion-col-title {
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: #ffffff;
-    }
-
-    .col-icon {
-      font-size: 18px;
-      &.col-icon-in  { color: #2dd36f; }
-      &.col-icon-out { color: #764ba2; }
-    }
-  }
-}
-
-// Lista scrollable
-.gestion-lista {
-  flex: 1;
-  overflow-y: auto;
-  max-height: 320px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding-right: 4px;
-
-  &::-webkit-scrollbar { width: 4px; }
-  &::-webkit-scrollbar-track { background: transparent; }
-  &::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 4px; }
-}
-
-// Item de usuario en el modal gestión
-.gestion-item {
+.tarea-drag-handle {
+  cursor: grab;
+  color: rgba(255, 255, 255, 0.3);
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 10px;
-  border-radius: 12px;
+  font-size: 18px;
+  flex-shrink: 0;
+  &:hover { color: rgba(255, 255, 255, 0.6); }
+  &:active { cursor: grabbing; }
+}
+
+.tarea-num {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.3);
+  min-width: 18px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.tarea-input {
+  flex: 1;
+  margin: 0 !important;
+  padding: 4px 8px !important;
+  min-height: unset !important;
+  height: 34px !important;
+  font-size: 0.875rem !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: #ffffff !important;
+
+  &::placeholder { color: rgba(255,255,255,0.3) !important; }
+  &:focus { outline: none; }
+}
+
+.tarea-quitar-btn {
+  flex-shrink: 0;
+  background: none;
+  border: none;
   cursor: pointer;
-  transition: background 0.15s, transform 0.1s;
-  border: 1px solid transparent;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.25);
+  transition: color 0.15s;
+
+  ion-icon { font-size: 18px; }
+
+  &:hover { color: #eb445a; }
+}
+
+.tareas-vacio {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 10px;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 0.85rem;
+  font-style: italic;
+
+  ion-icon { font-size: 18px; }
+}
+
+.btn-añadir-tarea {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(118, 75, 162, 0.12);
+  border: 1px dashed rgba(118, 75, 162, 0.4);
+  border-radius: 10px;
+  color: #a78bfa;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 8px 14px;
+  cursor: pointer;
+  width: 100%;
+  justify-content: center;
+  transition: background 0.15s, border-color 0.15s;
+
+  ion-icon { font-size: 16px; }
 
   &:hover {
-    transform: translateX(2px);
-    .gestion-accion ion-icon { opacity: 1; }
+    background: rgba(118, 75, 162, 0.2);
+    border-color: rgba(118, 75, 162, 0.7);
   }
-
-  &.gestion-item-in {
-    background: rgba(45, 211, 111, 0.05);
-    border-color: rgba(45, 211, 111, 0.15);
-
-    &:hover {
-      background: rgba(235, 68, 90, 0.07);
-      border-color: rgba(235, 68, 90, 0.2);
-      .gestion-quitar ion-icon { color: #eb445a; }
-    }
-  }
-
-  &.gestion-item-out {
-    background: rgba(118, 75, 162, 0.04);
-    border-color: rgba(118, 75, 162, 0.1);
-
-    &:hover {
-      background: rgba(118, 75, 162, 0.1);
-      border-color: rgba(118, 75, 162, 0.25);
-      .gestion-añadir ion-icon { color: #764ba2; }
-    }
-  }
-
-  &.gestion-item-disabled {
-    opacity: 0.45;
-    cursor: not-allowed;
-    pointer-events: none;
-  }
-
-  .usuario-info { flex: 1; min-width: 0;
-    .usuario-nombre { color: #ffffff; }
-    .usuario-id     { color: rgba(255, 255, 255, 0.5); }
-  }
-
-  .gestion-accion {
-    flex-shrink: 0;
-    ion-icon {
-      font-size: 20px;
-      opacity: 0.35;
-      transition: opacity 0.15s, color 0.15s;
-    }
-  }
-
-  .gestion-quitar ion-icon  { color: #eb445a; }
-  .gestion-añadir ion-icon  { color: #764ba2; }
 }
 
-.gestion-loading {
+.tareas-admin-aviso {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 0.875rem;
-  padding: 12px 4px;
-  ion-icon { font-size: 18px; }
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.35);
+  padding: 10px 2px 4px;
+  font-style: italic;
+
+  ion-icon { font-size: 15px; color: rgba(255,255,255,0.25); }
 }

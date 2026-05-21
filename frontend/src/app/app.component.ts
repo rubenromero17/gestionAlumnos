@@ -14,6 +14,10 @@ export class AppComponent implements OnInit {
   constructor(private authService: AuthService) {}
 
   ngOnInit(): void {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+      document.documentElement.classList.add('ion-palette-dark');
+    }
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') {
         const sesion = this.authService.obtenerSesion();

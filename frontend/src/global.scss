@@ -34,4 +34,23 @@
 
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import '@ionic/angular/css/palettes/dark.system.css';
+@import '@ionic/angular/css/palettes/dark.class.css';
+:root {
+  --bg-page:        #f0f2ff;
+  --bg-stats:       linear-gradient(135deg, #f8f4ff 0%, #f0e8ff 100%);
+  --bg-card:        #ffffff;
+  --bg-input:       #f5f6ff;
+  --text-primary:   #1a1a2e;
+  --text-secondary: #6b7280;
+  --border-color:   #e5e7eb;
+}
+
+:root.ion-palette-dark {
+  --bg-page:        #0f0f1a;
+  --bg-stats:       linear-gradient(135deg, #1e1a2e 0%, #251a35 100%);
+  --bg-card:        #1a1a2e;
+  --bg-input:       #252540;
+  --text-primary:   #e8e8f0;
+  --text-secondary: #9ca3af;
+  --border-color:   #2d2d4e;
+}
