@@ -1,60 +1,69 @@
 package com.example.backend.services;
 
 import com.example.backend.dto.ComentarioDTO;
+import com.example.backend.exception.ElementoNoEncontradoException;
 import com.example.backend.mapper.ComentarioMapper;
 import com.example.backend.models.Comentario;
+import com.example.backend.models.Proyecto;
+import com.example.backend.models.Usuario;
 import com.example.backend.repositories.ComentarioRepository;
-import com.example.backend.repositories.ProyectoRepository; // Asumiendo que existen
+import com.example.backend.repositories.ProyectoRepository;
 import com.example.backend.repositories.UsuarioRepository;
-import com.example.backend.exception.ElementoNoEncontradoException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ComentarioService {
 
-    @Autowired
-    private ComentarioRepository comentarioRepository;
+    private final ComentarioRepository comentarioRepository;
+    private final ProyectoRepository   proyectoRepository;
+    private final UsuarioRepository    usuarioRepository;
+    private final ComentarioMapper comentarioMapper;
 
-    @Autowired
-    private ComentarioMapper comentarioMapper;
-
-    @Autowired
-    private ProyectoRepository proyectoRepository;
-
-    @Autowired
-    private UsuarioRepository usuarioRepository;
-
-
-    public ComentarioDTO crearComentario(ComentarioDTO dto) {
-        Comentario comentario = comentarioMapper.toEntity(dto);
-
-        comentario.setProyecto(proyectoRepository.findById(dto.getProyectoId())
-                .orElseThrow(() -> new ElementoNoEncontradoException("Proyecto no encontrado")));
-        comentario.setUsuario(usuarioRepository.findById(dto.getUsuarioId())
-                .orElseThrow(() -> new ElementoNoEncontradoException("Usuario no encontrado")));
-
-        return comentarioMapper.toDTO(comentarioRepository.save(comentario));
+    public List<ComentarioDTO> getComentariosPorProyecto(Long proyectoId) {
+        return comentarioMapper.toDTO(
+                comentarioRepository.findByProyectoIdOrderByFechaAsc(proyectoId)
+        );
     }
 
-    public List<ComentarioDTO> obtenerTodos() {
-        return comentarioMapper.toDTO(comentarioRepository.findAll());
+    @Transactional
+    public ComentarioDTO crear(Long proyectoId, Long usuarioId, String texto) {
+        Proyecto proyecto = proyectoRepository.findById(proyectoId)
+                .orElseThrow(() -> new ElementoNoEncontradoException("Proyecto no encontrado: " + proyectoId));
+
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new ElementoNoEncontradoException("Usuario no encontrado: " + usuarioId));
+
+        Comentario c = new Comentario();
+        c.setProyecto(proyecto);
+        c.setUsuario(usuario);
+        c.setTexto(texto.trim());
+        c.setFecha(LocalDateTime.now());
+
+        return comentarioMapper.toDTO(comentarioRepository.save(c));
     }
 
-    public ComentarioDTO obtenerPorId(Long id) {
-        Comentario comentario = comentarioRepository.findById(id)
-                .orElseThrow(() -> new ElementoNoEncontradoException("Comentario no encontrado"));
-        return comentarioMapper.toDTO(comentario);
-    }
+    @Transactional
+    public void eliminar(Long comentarioId, Long usuarioId) {
+        Comentario c = comentarioRepository.findById(comentarioId)
+                .orElseThrow(() -> new ElementoNoEncontradoException("Comentario no encontrado: " + comentarioId));
 
-    public void eliminarComentario(Long id) {
-        if (!comentarioRepository.existsById(id)) {
-            throw new ElementoNoEncontradoException("No se puede eliminar: ID no existe");
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new ElementoNoEncontradoException("Usuario no encontrado: " + usuarioId));
+
+        boolean esAutor = c.getUsuario().getId().equals(usuarioId);
+        boolean esAdmin = "administrador".equalsIgnoreCase(usuario.getRol().name());
+
+        if (!esAutor && !esAdmin) {
+            throw new SecurityException("No tienes permiso para eliminar este comentario.");
         }
-        comentarioRepository.deleteById(id);
+
+        comentarioRepository.deleteById(comentarioId);
     }
 }

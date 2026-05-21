@@ -301,7 +301,7 @@
                   <ion-icon name="person-circle" slot="start" color="primary" style="font-size: 28px; margin-inline-end: 12px;"></ion-icon>
                   <ion-label>
                     <h3 style="margin: 0; font-weight: 600; color: #2d1f3d;">{{ alumno.nombreReal }}</h3>
-                    <p style="margin: 2px 0 0 0; font-size: 0.85em; color: #764ba2;">@ {{ alumno.nombreUsuario }}</p>
+                    <p style="margin: 2px 0 0 0; font-size: 0.85em; color: #764ba2;">@ {{ alumno.nombreUsuario }} </p>
                   </ion-label>
                 </ion-item>
               </ion-list>
@@ -317,26 +317,70 @@
             <div class="chat-section">
               <ion-label class="section-label">
                 <ion-icon name="chatbubbles-outline" class="section-icon"></ion-icon>
-                Bitácora y Comentarios
+                Chat del proyecto
+                <span class="chat-count-badge" *ngIf="comentarios.length > 0">
+                  {{ comentarios.length }}
+                </span>
               </ion-label>
 
-              <div class="comments-feed">
-                <div *ngFor="let c of proyectoSeleccionado.comentarios" class="comment-bubble">
-                  <p class="comment-text">{{ c }}</p>
+              <div class="comments-feed" #chatFeed>
+
+                <!-- Loading -->
+                <div class="chat-loading" *ngIf="loadingComentarios">
+                  <ion-icon name="hourglass-outline"></ion-icon>
+                  <span>Cargando mensajes...</span>
                 </div>
-                <div *ngIf="!proyectoSeleccionado.comentarios || proyectoSeleccionado.comentarios.length === 0" class="empty-chat">
+
+                <!-- Vacío -->
+                <div *ngIf="!loadingComentarios && comentarios.length === 0" class="empty-chat">
                   <ion-icon name="chatbubble-ellipses-outline" class="empty-chat-icon"></ion-icon>
-                  <p class="empty-chat-text">No hay notas registradas para este proyecto.</p>
+                  <p class="empty-chat-text">Sé el primero en escribir algo.</p>
+                </div>
+
+                <!-- Mensajes -->
+                <div
+                  *ngFor="let c of comentarios"
+                  class="comment-row"
+                  [class.comment-row-mine]="esMiMensaje(c)">
+
+                  <!-- Avatar -->
+                  <div class="comment-avatar" *ngIf="!esMiMensaje(c)">
+                    <img *ngIf="c.fotoUsuario" [src]="c.fotoUsuario" alt="avatar" />
+                    <ion-icon *ngIf="!c.fotoUsuario" name="person-outline"></ion-icon>
+                  </div>
+
+                  <!-- Burbuja -->
+                  <div class="comment-bubble-wrap">
+                    <span class="comment-author" *ngIf="!esMiMensaje(c)">{{ c.nombreUsuario }}</span>
+                    <div class="comment-bubble">
+                      <p class="comment-text">{{ c.texto }}</p>
+                      <span class="comment-time">{{ formatearFecha(c.fecha) }}</span>
+                    </div>
+                    <!-- Botón borrar solo para mensajes propios -->
+                    <button
+                      class="comment-delete-btn"
+                      *ngIf="esMiMensaje(c)"
+                      (click)="eliminarComentario(c)"
+                      title="Eliminar">
+                      <ion-icon name="trash-outline"></ion-icon>
+                    </button>
+                  </div>
+
                 </div>
               </div>
 
               <div class="chat-input-container">
-                <ion-input [(ngModel)]="nuevoComentario"
-                           placeholder="Escribir una nota interna..."
-                           (keyup.enter)="agregarComentario()"
-                           class="chat-input">
+                <ion-input
+                  [(ngModel)]="nuevoComentario"
+                  placeholder="Escribe un mensaje..."
+                  (keyup.enter)="agregarComentario()"
+                  class="chat-input">
                 </ion-input>
-                <ion-button fill="solid" (click)="agregarComentario()" [disabled]="!nuevoComentario?.trim()" class="send-button">
+                <ion-button
+                  fill="solid"
+                  (click)="agregarComentario()"
+                  [disabled]="!nuevoComentario?.trim() || enviandoComentario"
+                  class="send-button">
                   <ion-icon name="send" slot="icon-only" class="send-icon"></ion-icon>
                 </ion-button>
               </div>

@@ -8,5 +8,6 @@ public class TareaProyectoDTO {
     private Long    proyectoId;
     private String  titulo;
     private Integer orden;
+    /** Solo se rellena cuando el alumno consulta sus tareas */
     private Boolean completada;
 }

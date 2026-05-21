@@ -13,6 +13,7 @@ export interface LoginResponse {
   nombreReal: string;
   nombreUsuario: string;
   rol: string;
+  fotoUsuario?: string | null;
 }
 
 export interface RegisterDTO {

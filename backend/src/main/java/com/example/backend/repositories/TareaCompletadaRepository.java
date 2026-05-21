@@ -12,5 +12,6 @@ public interface TareaCompletadaRepository extends JpaRepository<TareaCompletada
 
     Optional<TareaCompletada> findByTareaIdAndAlumnoId(Long tareaId, Long alumnoId);
 
+    /** Para saber cuántos alumnos han completado una tarea (útil a futuro) */
     long countByTareaIdAndCompletadaTrue(Long tareaId);
 }

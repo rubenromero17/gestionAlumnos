@@ -15,7 +15,10 @@ import {
   chatbubbleEllipsesOutline, send, statsChartOutline,
   listOutline, checkmarkDoneCircle, eyeOutline,
   peopleOutline, folderOpenOutline, searchOutline,
-  calendarOutline, saveOutline
+  calendarOutline, saveOutline,
+  checkboxOutline, checkmarkOutline, checkmarkCircleOutline,
+  hourglassOutline, playCircleOutline,
+  trashOutline, personOutline
 } from 'ionicons/icons';
 import { HeaderComponent } from '../components/header/header.component';
 import { proyecto } from '../modelos/proyecto';
@@ -26,6 +29,8 @@ import { AsistenciaService } from '../services/asistencia-service';
 import { inject } from '@angular/core';
 import { forkJoin } from 'rxjs';
 import { RouterLink } from '@angular/router';
+import {ComentarioDTO, ComentarioService} from "../services/comentario-service";
+import {TareaDTO, TareaService} from "../services/tarea-service";
 
 @Component({
   selector: 'app-home',
@@ -46,6 +51,15 @@ export class HomePage implements OnInit {
   proyectoSeleccionado: any = null;
   esProyectoInscrito = false;
   nuevoComentario: string = '';
+  enviandoComentario = false;
+
+  // Chat
+  comentarios: ComentarioDTO[] = [];
+  loadingComentarios = false;
+
+  // Tareas del proyecto (alumno)
+  tareasProyecto: TareaDTO[] = [];
+  loadingTareas = false;
 
   mostrarTarjetaAsistencia = true;
   isExiting = false;
@@ -59,13 +73,11 @@ export class HomePage implements OnInit {
   mostrarFormHorario = false;
   guardandoHorario = false;
   alumnoIdReal: number | null = null;
-  // Ya no necesita diaSemana: se guarda para todos los días laborables de golpe
   formHorario = { horaInicio: '', horaFin: '' };
 
   // Proyectos
   misProyectos: proyecto[] = [];
   nuevosProyectos: proyecto[] = [];
-
   misProyectosFiltrados: proyecto[] = [];
   nuevosProyectosFiltrados: proyecto[] = [];
   loadingProyectos = true;
@@ -75,6 +87,8 @@ export class HomePage implements OnInit {
   private authService = inject(AuthService);
   private alumnoService = inject(AlumnoService);
   private asistenciaService = inject(AsistenciaService);
+  private tareaService = inject(TareaService);
+  private comentarioService = inject(ComentarioService);
 
   constructor() {
     addIcons({
@@ -83,7 +97,10 @@ export class HomePage implements OnInit {
       chatbubbleEllipsesOutline, send, statsChartOutline,
       listOutline, checkmarkDoneCircle, eyeOutline,
       peopleOutline, folderOpenOutline, searchOutline,
-      calendarOutline, saveOutline
+      calendarOutline, saveOutline,
+      checkboxOutline, checkmarkOutline, checkmarkCircleOutline,
+      hourglassOutline, playCircleOutline,
+      trashOutline, personOutline
     });
   }
 
@@ -97,7 +114,7 @@ export class HomePage implements OnInit {
   }
 
   // ─────────────────────────────────────────────────────────────
-  // CARGA DE HORARIO Y FICHAJE
+  // HORARIO Y FICHAJE
   // ─────────────────────────────────────────────────────────────
   cargarHorarioYFichaje() {
     const sesion = this.authService.obtenerSesion();
@@ -111,7 +128,6 @@ export class HomePage implements OnInit {
     this.alumnoService.getAlumnoByUsuarioId(sesion.id).subscribe({
       next: (alumno: any) => {
         console.log('[DEBUG] Respuesta getAlumnoByUsuarioId:', JSON.stringify(alumno));
-
         const alumnoId: number = alumno.alumnoId ?? alumno.id;
 
         if (!alumnoId) {
@@ -122,7 +138,6 @@ export class HomePage implements OnInit {
 
         this.alumnoIdReal = alumnoId;
 
-        // Verificar si ya fichó hoy
         this.asistenciaService.haFichadoHoy(alumnoId).subscribe({
           next: (asistencia) => {
             this.asistenciaHoy = asistencia;
@@ -204,7 +219,7 @@ export class HomePage implements OnInit {
   }
 
   // ─────────────────────────────────────────────────────────────
-  // GUARDAR HORARIO (primera vez — guarda lunes a viernes de golpe)
+  // GUARDAR HORARIO
   // ─────────────────────────────────────────────────────────────
   async guardarHorario() {
     if (!this.alumnoIdReal || !this.formHorario.horaInicio || !this.formHorario.horaFin) {
@@ -348,6 +363,9 @@ export class HomePage implements OnInit {
     return 'Inscribirse';
   }
 
+  // ─────────────────────────────────────────────────────────────
+  // FICHAJE
+  // ─────────────────────────────────────────────────────────────
   async fichar() {
     if (!this.alumnoIdReal) return;
 
@@ -359,23 +377,17 @@ export class HomePage implements OnInit {
         if (sesion?.id) {
           localStorage.setItem(`fechaFichaje_${sesion.id}`, hoy);
         }
-
         const toast = await this.toastController.create({
           message: '✅ Entrada registrada correctamente',
-          duration: 2000,
-          position: 'top',
-          color: 'success'
+          duration: 2000, position: 'top', color: 'success'
         });
         await toast.present();
-
         this.cargarHorarioYFichaje();
       },
       error: async () => {
         const toast = await this.toastController.create({
           message: '❌ Error al registrar la entrada',
-          duration: 2000,
-          position: 'top',
-          color: 'danger'
+          duration: 2000, position: 'top', color: 'danger'
         });
         await toast.present();
       }
@@ -389,21 +401,16 @@ export class HomePage implements OnInit {
       next: async () => {
         const toast = await this.toastController.create({
           message: '✅ Salida registrada correctamente. ¡Buen trabajo hoy! 🚀',
-          duration: 2000,
-          position: 'top',
-          color: 'success'
+          duration: 2000, position: 'top', color: 'success'
         });
         await toast.present();
-
         this.cargarHorarioYFichaje();
       },
       error: async (err) => {
         const mensaje = err?.error?.message ?? 'Error al registrar la salida';
         const toast = await this.toastController.create({
           message: `❌ ${mensaje}`,
-          duration: 2500,
-          position: 'top',
-          color: 'danger'
+          duration: 2500, position: 'top', color: 'danger'
         });
         await toast.present();
       }
@@ -411,15 +418,13 @@ export class HomePage implements OnInit {
   }
 
   // ─────────────────────────────────────────────────────────────
-  // INSCRIBIRSE
+  // INSCRIBIRSE / SALIR
   // ─────────────────────────────────────────────────────────────
   async inscribirse(p: proyecto) {
     if (p.cuposDisponibles <= 0) {
       const toast = await this.toastController.create({
         message: `❌ El proyecto "${p.titulo}" no tiene cupos disponibles.`,
-        duration: 3000,
-        color: 'danger',
-        position: 'bottom'
+        duration: 3000, color: 'danger', position: 'bottom'
       });
       await toast.present();
       return;
@@ -432,9 +437,7 @@ export class HomePage implements OnInit {
       next: async () => {
         const toast = await this.toastController.create({
           message: `✅ Te has inscrito en "${p.titulo}" correctamente.`,
-          duration: 2500,
-          color: 'success',
-          position: 'bottom'
+          duration: 2500, color: 'success', position: 'bottom'
         });
         await toast.present();
         this.cargarProyectos();
@@ -443,40 +446,11 @@ export class HomePage implements OnInit {
         const mensaje = err?.error?.mensaje ?? 'Error al inscribirse. Inténtalo de nuevo.';
         const toast = await this.toastController.create({
           message: `❌ ${mensaje}`,
-          duration: 3500,
-          color: 'danger',
-          position: 'bottom'
+          duration: 3500, color: 'danger', position: 'bottom'
         });
         await toast.present();
       }
     });
-  }
-
-
-  verDetalles(p: any, inscrito: boolean) {
-    this.proyectoSeleccionado = { ...p, alumnos: [] };
-    this.esProyectoInscrito = inscrito;
-    this.isModalOpen = true;
-
-    this.proyectoService.getAlumnosPorProyecto(p.id).subscribe({
-      next: (alumnosBackend: any[]) => {
-        this.proyectoSeleccionado.alumnos = alumnosBackend;
-      },
-      error: (err) => {
-        console.warn('[WARN] No se pudo cargar la lista de alumnos para este proyecto', err);
-        this.proyectoSeleccionado.alumnos = [];
-      }
-    });
-  }
-
-  agregarComentario() {
-    if (this.nuevoComentario.trim() && this.proyectoSeleccionado) {
-      if (!this.proyectoSeleccionado.comentarios) {
-        this.proyectoSeleccionado.comentarios = [];
-      }
-      this.proyectoSeleccionado.comentarios.push(this.nuevoComentario);
-      this.nuevoComentario = '';
-    }
   }
 
   async salirDeProyecto(p: proyecto) {
@@ -487,9 +461,7 @@ export class HomePage implements OnInit {
       next: async () => {
         const toast = await this.toastController.create({
           message: `✅ Has salido de "${p.titulo}" correctamente.`,
-          duration: 2500,
-          color: 'success',
-          position: 'bottom'
+          duration: 2500, color: 'success', position: 'bottom'
         });
         await toast.present();
         this.cargarProyectos();
@@ -498,12 +470,164 @@ export class HomePage implements OnInit {
         const mensaje = err?.error?.mensaje ?? 'Error al salir del proyecto. Inténtalo de nuevo.';
         const toast = await this.toastController.create({
           message: `❌ ${mensaje}`,
-          duration: 3500,
-          color: 'danger',
-          position: 'bottom'
+          duration: 3500, color: 'danger', position: 'bottom'
         });
         await toast.present();
       }
     });
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // VER DETALLES / MODAL
+  // ─────────────────────────────────────────────────────────────
+  verDetalles(p: any, inscrito: boolean) {
+    this.proyectoSeleccionado = { ...p, alumnos: [] };
+    this.esProyectoInscrito = inscrito;
+    this.isModalOpen = true;
+    this.tareasProyecto = [];
+    this.comentarios = [];
+    this.nuevoComentario = '';
+
+    this.proyectoService.getAlumnosPorProyecto(p.id).subscribe({
+      next: (alumnosBackend: any[]) => {
+        this.proyectoSeleccionado.alumnos = alumnosBackend;
+      },
+      error: (err) => {
+        console.warn('[WARN] No se pudo cargar la lista de alumnos para este proyecto', err);
+        this.proyectoSeleccionado.alumnos = [];
+      }
+    });
+
+    this.cargarComentarios(p.id);
+
+    if (inscrito) {
+      const sesion = this.authService.obtenerSesion();
+      if (sesion?.id) {
+        this.loadingTareas = true;
+        this.tareaService.getTareasConEstado(p.id, sesion.id).subscribe({
+          next: (tareas) => {
+            this.tareasProyecto = tareas;
+            this.loadingTareas = false;
+          },
+          error: () => {
+            this.tareasProyecto = [];
+            this.loadingTareas = false;
+          }
+        });
+      }
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // CHAT
+  // ─────────────────────────────────────────────────────────────
+  cargarComentarios(proyectoId: number) {
+    this.loadingComentarios = true;
+    this.comentarioService.getByProyecto(proyectoId).subscribe({
+      next: (lista) => {
+        this.comentarios = lista;
+        this.loadingComentarios = false;
+        this.scrollChatAbajo();
+      },
+      error: () => {
+        this.comentarios = [];
+        this.loadingComentarios = false;
+      }
+    });
+  }
+
+  agregarComentario() {
+    const texto = this.nuevoComentario.trim();
+    if (!texto || this.enviandoComentario) return;
+
+    const sesion = this.authService.obtenerSesion();
+    if (!sesion?.id || !this.proyectoSeleccionado?.id) return;
+
+    this.enviandoComentario = true;
+
+    const temporal: ComentarioDTO = {
+      id: -Date.now(),
+      proyectoId: this.proyectoSeleccionado.id,
+      usuarioId: sesion.id,
+      nombreUsuario: sesion.nombreReal ?? 'Tú',
+      fotoUsuario: sesion.fotoUsuario ?? undefined,
+      texto,
+      fecha: new Date().toISOString()
+    };
+    this.comentarios = [...this.comentarios, temporal];
+    this.nuevoComentario = '';
+    this.scrollChatAbajo();
+
+    this.comentarioService.crear(this.proyectoSeleccionado.id, sesion.id, texto).subscribe({
+      next: (real) => {
+        this.comentarios = this.comentarios.map(c => c.id === temporal.id ? real : c);
+        this.enviandoComentario = false;
+      },
+      error: () => {
+        this.comentarios = this.comentarios.filter(c => c.id !== temporal.id);
+        this.enviandoComentario = false;
+        this.nuevoComentario = texto;
+      }
+    });
+  }
+
+  eliminarComentario(comentario: ComentarioDTO) {
+    const sesion = this.authService.obtenerSesion();
+    if (!sesion?.id) return;
+
+    this.comentarios = this.comentarios.filter(c => c.id !== comentario.id);
+
+    this.comentarioService.eliminar(comentario.id, sesion.id).subscribe({
+      error: () => {
+        this.comentarios = [...this.comentarios, comentario]
+          .sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime());
+      }
+    });
+  }
+
+  esMiMensaje(comentario: ComentarioDTO): boolean {
+    return this.authService.obtenerSesion()?.id === comentario.usuarioId;
+  }
+
+  formatearFecha(iso: string): string {
+    const d = new Date(iso);
+    const hoy = new Date();
+    const esHoy = d.toDateString() === hoy.toDateString();
+    const hora = d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+    if (esHoy) return hora;
+    return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }) + ' · ' + hora;
+  }
+
+  private scrollChatAbajo() {
+    setTimeout(() => {
+      const feed = document.querySelector('.comments-feed');
+      if (feed) feed.scrollTop = feed.scrollHeight;
+    }, 60);
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // TAREAS
+  // ─────────────────────────────────────────────────────────────
+  toggleTarea(tarea: TareaDTO) {
+    const sesion = this.authService.obtenerSesion();
+    if (!sesion?.id || !tarea.id) return;
+
+    const nuevoEstado = !tarea.completada;
+    tarea.completada = nuevoEstado;
+
+    this.tareaService.toggleTarea(tarea.id, sesion.id, nuevoEstado).subscribe({
+      error: () => {
+        tarea.completada = !nuevoEstado;
+      }
+    });
+  }
+
+  tareasCompletadasCount(): number {
+    return this.tareasProyecto.filter(t => t.completada).length;
+  }
+
+  tareasProgresoPct(): number {
+    if (this.tareasProyecto.length === 0) return 0;
+    return Math.round((this.tareasCompletadasCount() / this.tareasProyecto.length) * 100);
   }
 }
