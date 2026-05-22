@@ -15,6 +15,22 @@ export class ProyectoService {
     return this.http.get<proyecto[]>(`${this.apiService.apiUrl}/proyecto`);
   }
 
+  getProyectosPorAlumno(alumnoId: number): Observable<proyecto[]> {
+    return this.http.get<proyecto[]>(`${this.apiService.apiUrl}/asignacion/alumno/${alumnoId}`);
+  }
+
+  getProyectosActivos(alumnoId: number): Observable<proyecto[]> {
+    return this.http.get<proyecto[]>(
+      `${this.apiService.apiUrl}/proyecto/alumno/${alumnoId}/activos`
+    );
+  }
+
+  getProyectosDisponibles(alumnoId: number): Observable<proyecto[]> {
+    return this.http.get<proyecto[]>(
+      `${this.apiService.apiUrl}/proyecto/alumno/${alumnoId}/explorar`
+    );
+  }
+
   getProyectoById(id: number): Observable<proyecto> {
     return this.http.get<proyecto>(`${this.apiService.apiUrl}/proyecto/${id}`);
   }
@@ -29,5 +45,15 @@ export class ProyectoService {
 
   eliminarProyecto(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiService.apiUrl}/proyecto/${id}`);
+  }
+
+  inscribirse(alumnoId: number, proyectoId: number): Observable<any> {
+    return this.http.post(`${this.apiService.apiUrl}/asignacion`, { alumnoId, proyectoId });
+  }
+
+  salir(alumnoId: number, proyectoId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiService.apiUrl}/asignacion`, {
+      body: { alumnoId, proyectoId }
+    });
   }
 }

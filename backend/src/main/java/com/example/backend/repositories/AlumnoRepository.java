@@ -3,6 +3,7 @@ package com.example.backend.repositories;
 import com.example.backend.models.Alumno;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import com.example.backend.models.EstadoProyecto;
 
 import java.util.Optional;
 
@@ -10,4 +11,5 @@ import java.util.Optional;
 public interface AlumnoRepository extends JpaRepository<Alumno, Long> {
 
     Optional<Alumno> findByUsuarioId(Long usuarioId);
+
 }

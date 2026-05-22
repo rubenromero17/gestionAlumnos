@@ -5,12 +5,12 @@ import {
   IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton,
   IonIcon, IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardSubtitle,
   IonCardTitle, IonCardContent, IonList, IonItem, IonInput, IonModal, IonSearchbar,
-  IonLabel, IonToggle, NavController, ToastController
+  IonLabel, IonToggle, IonChip, NavController, ToastController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   personCircle, personOutline, closeOutline, schoolOutline, lockClosedOutline, exitOutline,
-  timeOutline, shieldCheckmarkOutline, desktopOutline, addOutline, trashOutline
+  timeOutline, shieldCheckmarkOutline, desktopOutline, addOutline, trashOutline, folderOpenOutline, briefcaseOutline, peopleOutline
 } from 'ionicons/icons';
 import { RouterLink } from '@angular/router';
 import { HeaderComponent } from '../components/header/header.component';
@@ -18,7 +18,8 @@ import { AuthService } from '../services/auth-service';
 import { UsuarioService } from '../services/usuario-service';
 import { CambioPasswordDTO } from '../services/usuario-service';
 import { ModalidadService } from '../services/modalidad-service';
-
+import { ProyectoService } from '../services/proyecto-service';
+import { proyecto } from '../modelos/proyecto';
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.page.html',
@@ -30,13 +31,15 @@ import { ModalidadService } from '../services/modalidad-service';
     IonList, IonItem, IonInput, CommonModule, FormsModule,
     RouterLink,
     IonModal, IonHeader, IonTitle, IonToolbar, IonButtons,
-    IonLabel, IonToggle, IonSearchbar, HeaderComponent
+    IonLabel, IonToggle, IonSearchbar, IonChip, HeaderComponent
   ]
 })
 export class ProfilePage implements OnInit {
 
   isPasswordModalOpen = false;
   fotoUrl: string | null = null;
+  numProyectos: number = 0;
+  proyectosActivos: proyecto[] = [];
 
   modalidades: { id: number; nombre: string }[] = [];
   modalidadIdSeleccionada: number | null = null;
@@ -67,10 +70,11 @@ export class ProfilePage implements OnInit {
     private authService: AuthService,
     private usuarioService: UsuarioService,
     private modalidadService: ModalidadService,
+    private proyectoService: ProyectoService,
   ) {
     addIcons({
       personCircle, personOutline, closeOutline, lockClosedOutline, schoolOutline, exitOutline,
-      timeOutline, shieldCheckmarkOutline, desktopOutline, addOutline, trashOutline
+      timeOutline, shieldCheckmarkOutline, desktopOutline, addOutline, trashOutline,  folderOpenOutline, briefcaseOutline, peopleOutline
     });
   }
 
@@ -109,10 +113,30 @@ export class ProfilePage implements OnInit {
         if (!this.fotoUrl && (usuario as any).fotoUsuario) {
           this.fotoUrl = (usuario as any).fotoUsuario;
         }
+        // Total de proyectos inscritos (para el contador del perfil)
+        this.proyectoService.getProyectosPorAlumno(sesion.id).subscribe({
+          next: (proyectos) => {
+            this.numProyectos = proyectos.length;
+          },
+          error: () => {
+            this.numProyectos = 0;
+          }
+        });
+
+// Proyectos activos con cupos en tiempo real (va directo a la tabla de proyectos)
+        this.proyectoService.getProyectosActivos(sesion.id).subscribe({
+          next: (proyectos) => {
+            this.proyectosActivos = proyectos;
+          },
+          error: () => {
+            this.proyectosActivos = [];
+          }
+        });
       },
       error: () => {
         this.presentToast('No se pudieron cargar todos los datos del perfil', 'warning');
       }
+
     });
   }
 

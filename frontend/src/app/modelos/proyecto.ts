@@ -6,5 +6,7 @@ export interface proyecto {
   descripcion: string;
   cupoMaximo: number;
   estado: EstadoProyecto;
+  cuposDisponibles: number;
   fotoProyecto?: string | null;
+  videoUrl?: string;
 }
