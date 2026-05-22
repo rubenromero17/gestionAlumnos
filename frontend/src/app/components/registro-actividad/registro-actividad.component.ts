@@ -11,8 +11,7 @@ import {
 import { AuthService } from '../../services/auth-service';
 import { RegistroActividadService } from '../../services/registro-actividad-service';
 
-// ── Configuración ────────────────────────────────────────────
-const MIN_INTERVALO_MIN = 120;  // 2 horas
+const MIN_INTERVALO_MIN = 120;
 const MAX_INTERVALO_MIN = 120;
 const SEGUNDOS_RESPUESTA = 30;
 const CIRCUNFERENCIA = 2 * Math.PI * 24;
@@ -65,8 +64,6 @@ export class AfkPopupComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    // ✅ Solo la suscripción — si sesion$ es BehaviorSubject ya emite
-    //    el valor actual al suscribirse, evitando la doble llamada
     this.authService.sesion$.subscribe(sesion => {
       if (sesion) {
         this.programarSiguientePopup();
@@ -90,7 +87,6 @@ export class AfkPopupComponent implements OnInit, OnDestroy {
     const sesion = this.authService.obtenerSesion();
     if (!sesion) return;
 
-    // ✅ ISO siempre produce HH:mm:ss sin dependencias de locale ni navegador
     this.horaDisparo = new Date().toISOString().slice(11, 19);
 
     this.segundosRestantes = SEGUNDOS_RESPUESTA;
@@ -124,7 +120,7 @@ export class AfkPopupComponent implements OnInit, OnDestroy {
 
   private registrarRespuesta(usuarioId: number, respondido: boolean) {
     const payload = { usuarioId, hora: this.horaDisparo, respondido };
-    console.log('[AfkPopup] Enviando:', payload); // quita esta línea cuando funcione
+    console.log('[AfkPopup] Enviando:', payload);
     this.registroService.registrar(payload).subscribe({
       error: (err) => console.error('[AfkPopup] Error al registrar:', err)
     });

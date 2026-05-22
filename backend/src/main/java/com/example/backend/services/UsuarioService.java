@@ -61,7 +61,6 @@ public class UsuarioService {
 
         Usuario usuarioGuardado = usuarioRepository.save(usuario);
 
-        // Si el nuevo usuario es alumno, crear su fila en la tabla alumno (sin modalidad)
         if (Rol.alumno.equals(usuarioGuardado.getRol())) {
             Alumno alumno = new Alumno();
             alumno.setUsuario(usuarioGuardado);
@@ -174,7 +173,6 @@ public class UsuarioService {
         com.example.backend.models.Modalidad modalidad = modalidadRepository.findById(modalidadId)
                 .orElseThrow(() -> new ElementoNoEncontradoException("Modalidad no encontrada con id: " + modalidadId));
 
-        // Buscar la fila de alumno; si no existe (usuarios creados antes de este fix), crearla
         Alumno alumno = alumnoRepository.findByUsuarioId(usuarioId)
                 .orElseGet(() -> {
                     Alumno nuevo = new Alumno();

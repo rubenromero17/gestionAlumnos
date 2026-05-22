@@ -21,10 +21,8 @@ import {
   imageOutline, timeOutline, logInOutline, logOutOutline, calendarOutline, saveOutline,
   checkmarkDoneCircle,
   reorderThreeOutline, informationCircleOutline,
-  // ── AFK ──────────────────────────────────────────────────────
   closeCircleOutline, checkmarkDoneCircleOutline,
   chevronUpOutline, chevronDownOutline,
-  // ── Gestión alumnos proyecto ──────────────────────────────────
   personAddOutline as personAddO, personRemoveOutline, banOutline
 } from 'ionicons/icons';
 import { alumno } from '../modelos/alumno';
@@ -38,7 +36,6 @@ import { HeaderComponent } from '../components/header/header.component';
 import { forkJoin } from 'rxjs';
 import { RegistroActividad, RegistroActividadService } from "../services/registro-actividad-service";
 import {TareaService} from "../services/tarea-service";
-// ── AFK ────────────────────────────────────────────────────────
 
 @Component({
   selector: 'app-home-admin',
@@ -59,9 +56,7 @@ export class HomeAdminPage implements OnInit {
 
   mostrarTodosUsuarios: boolean = false;
   mostrarTodosProyectos: boolean = false;
-  // ── FIX: mapa usuarioId → alumnoId para cruzar usuarios con asistencia ──────
   private usuarioIdToAlumnoId: Map<number, number> = new Map();
-  // ── Fichaje del administrador ──────────────────────────────────────────────
   mostrarTarjetaAsistencia = false;
   isExiting = false;
   nombreUsuario = '';
@@ -74,14 +69,12 @@ export class HomeAdminPage implements OnInit {
   formHorario = { diaSemana: '', horaInicio: '', horaFin: '' };
   diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
-  // Proyectos
   proyectos: proyecto[] = [];
   filtroProyectos: proyecto[] = [];
   loadingProyectos: boolean = true;
   textoBusquedaProyecto: string = '';
   filtroEstado: string = '';
 
-  // Modal proyecto
   modalProyectoAbierto: boolean = false;
   proyectoEditando: proyecto | null = null;
   guardandoProyecto: boolean = false;
@@ -92,44 +85,37 @@ export class HomeAdminPage implements OnInit {
     { titulo: '', descripcion: '', cupoMaximo: 5, estado: 'en curso', fotoProyecto: null, videoUrl: '' };
   @ViewChild('inputImagen') inputImagenRef!: ElementRef<HTMLInputElement>;
 
-  // Usuarios
   usuarios: Usuario[] = [];
   filtroUsuarios: Usuario[] = [];
   loadingUsuarios: boolean = true;
   textoBusqueda: string = '';
   filtroRol: string = '';
   filtroFichado: string = '';
-  // Set con los alumnoId que han fichado hoy
   fichadosHoyIds: Set<number> = new Set();
   fichadosHoyMap: Map<number, AsistenciaDTO> = new Map();
 
-  // Modal edición individual
   modalEdicionAbierto: boolean = false;
   usuarioEditando: Usuario |
     null = null;
   guardandoEdicion: boolean = false;
   formEdicion = { nombreReal: '', nombreUsuario: '', rol: '', contrasenaHash: '' };
-  // Modal cambio masivo de rol
   modalCambioMasivoAbierto: boolean = false;
   seleccionadosMasivo: number[] = [];
   rolMasivoDestino: string = 'administrador';
   guardandoCambioMasivo: boolean = false;
   busquedaMasivo: string = '';
   usuariosFiltradosMasivo: Usuario[] = [];
-  // ── AFK ──────────────────────────────────────────────────────
   registrosAfk: RegistroActividad[] = [];
   loadingAfk: boolean = true;
   mostrarTodosAfk: boolean = false;
 
-  // ── TAREAS DE PROYECTO (admin) ────────────────────────────────────────────
-  formTareas: string[] = [];          // títulos editables en el modal
+  formTareas: string[] = [];
   guardandoTareas: boolean = false;
 
-  // ── MODAL GESTIÓN ALUMNOS PROYECTO ────────────────────────────────────────
   modalAlumnosProyectoAbierto: boolean = false;
   proyectoGestionando: proyecto | null = null;
-  alumnosDelProyecto: any[] = [];          // alumnos ya inscritos (con usuarioId)
-  candidatosProyecto: Usuario[] = [];      // resultado de la búsqueda
+  alumnosDelProyecto: any[] = [];
+  candidatosProyecto: Usuario[] = [];
   busquedaAlumnosProyecto: string = '';
   guardandoAlumnosProyecto: boolean = false;
   private asistenciaService = inject(AsistenciaService);
@@ -155,10 +141,8 @@ export class HomeAdminPage implements OnInit {
       imageOutline, timeOutline, logInOutline, logOutOutline, calendarOutline, saveOutline,
       checkmarkDoneCircle,
       reorderThreeOutline, informationCircleOutline,
-      // ── AFK ────────────────────────────────────────────────
       closeCircleOutline, checkmarkDoneCircleOutline,
       chevronUpOutline, chevronDownOutline,
-      // ── Gestión alumnos proyecto ──────────────────────────
       'person-add-outline': personAddO,
       personRemoveOutline,
       banOutline
@@ -175,9 +159,7 @@ export class HomeAdminPage implements OnInit {
     this.cargarRegistrosAfkHoy(); // ── AFK
   }
 
-  // ─────────────────────────────────────────────────────────────
-  // CARGA CONJUNTA alumnos + usuarios
-  // ─────────────────────────────────────────────────────────────
+
   cargarAlumnosYUsuarios() {
     this.loading = true;
     this.loadingUsuarios = true;
@@ -209,9 +191,7 @@ export class HomeAdminPage implements OnInit {
     });
   }
 
-  // ─────────────────────────────────────────────────────────────
-  // FICHADOS HOY
-  // ─────────────────────────────────────────────────────────────
+
   cargarFichadosHoy() {
     this.asistenciaService.fichadosHoy().subscribe({
       next: (lista) => {
@@ -227,9 +207,7 @@ export class HomeAdminPage implements OnInit {
     });
   }
 
-  // ─────────────────────────────────────────────────────────────
-  // FICHAJE DEL ADMINISTRADOR
-  // ─────────────────────────────────────────────────────────────
+
   cargarHorarioYFichaje() {
     const sesion = this.authService.obtenerSesion();
     if (!sesion?.id) return;
@@ -370,11 +348,7 @@ export class HomeAdminPage implements OnInit {
     });
   }
 
-  // AHORA: convierte usuario.id → alumnoId usando el mapa y comprueba el Set
 
-  // ─────────────────────────────────────────────────────────────
-  // haFichadoHoy
-  // ─────────────────────────────────────────────────────────────
   haFichadoHoy(usuarioId: number): boolean {
     const alumnoId = this.usuarioIdToAlumnoId.get(usuarioId);
     if (alumnoId === undefined) return false;
@@ -387,9 +361,6 @@ export class HomeAdminPage implements OnInit {
     return this.fichadosHoyMap.get(alumnoId) || null;
   }
 
-  // ─────────────────────────────────────────────────────────────
-  // PROYECTOS
-  // ─────────────────────────────────────────────────────────────
   cargarProyectos() {
     this.loadingProyectos = true;
     this.proyectoService.getProyectos().subscribe({
@@ -512,9 +483,6 @@ export class HomeAdminPage implements OnInit {
     });
   }
 
-  // ─────────────────────────────────────────────────────────────
-  // USUARIOS Y FILTROS
-  // ─────────────────────────────────────────────────────────────
   buscarUsuario(event: any) {
     this.textoBusqueda = event.target.value?.toLowerCase() ?? '';
     this.aplicarFiltros();
@@ -579,9 +547,7 @@ export class HomeAdminPage implements OnInit {
     await toast.present();
   }
 
-  // ─────────────────────────────────────────────────────────────
-  // MODAL EDICIÓN INDIVIDUAL
-  // ─────────────────────────────────────────────────────────────
+
   abrirModalEdicion(usuario: Usuario) {
     this.usuarioEditando = usuario;
     this.formEdicion = {
@@ -628,9 +594,7 @@ export class HomeAdminPage implements OnInit {
     });
   }
 
-  // ─────────────────────────────────────────────────────────────
-  // MODAL CAMBIO MASIVO DE ROL
-  // ─────────────────────────────────────────────────────────────
+
   abrirModalCambioMasivoRol() {
     this.seleccionadosMasivo = [];
     this.rolMasivoDestino = 'administrador';
@@ -717,9 +681,6 @@ export class HomeAdminPage implements OnInit {
     });
   }
 
-  // ─────────────────────────────────────────────────────────────
-  // IMAGEN PROYECTO
-  // ─────────────────────────────────────────────────────────────
   triggerInputImagen() {
     this.inputImagenRef?.nativeElement.click();
   }
@@ -760,9 +721,6 @@ export class HomeAdminPage implements OnInit {
     this.mostrarTodosProyectos = !this.mostrarTodosProyectos;
   }
 
-  // ─────────────────────────────────────────────────────────────
-  // ACTIVIDAD ANTI-AFK
-  // ─────────────────────────────────────────────────────────────
   cargarRegistrosAfkHoy() {
     this.loadingAfk = true;
     this.registroActividadService.getHoy().subscribe({
@@ -792,11 +750,7 @@ export class HomeAdminPage implements OnInit {
     return this.getIconoPorRol(u?.rol ?? '');
   }
 
-  // ─────────────────────────────────────────────────────────────
-  // TAREAS DE PROYECTO — ADMIN
-  // ─────────────────────────────────────────────────────────────
 
-  /** Carga las tareas existentes al abrir el modal de edición */
   private cargarTareasEnForm(proyectoId: number) {
     this.tareaService.getTareasPorProyecto(proyectoId).subscribe({
       next: (tareas) => {
@@ -806,14 +760,12 @@ export class HomeAdminPage implements OnInit {
     });
   }
 
-  /** Añade una fila vacía (o después del índice indicado) */
   agregarTarea(despuesDeIndex?: number) {
     if (despuesDeIndex !== undefined) {
       this.formTareas.splice(despuesDeIndex + 1, 0, '');
     } else {
       this.formTareas.push('');
     }
-    // Focus al nuevo input en el siguiente tick
     setTimeout(() => {
       const inputs = document.querySelectorAll<HTMLInputElement>('.tarea-input');
       const target = despuesDeIndex !== undefined ? despuesDeIndex + 1 : this.formTareas.length - 1;
@@ -821,24 +773,20 @@ export class HomeAdminPage implements OnInit {
     }, 50);
   }
 
-  /** TrackBy por índice para evitar que el ngFor destruya los inputs al escribir */
   trackByIndex(index: number): number {
     return index;
   }
 
-  /** Elimina la fila en el índice indicado */
   quitarTarea(index: number) {
     this.formTareas.splice(index, 1);
   }
 
-  /** Drag & drop reorder (CDK) */
   reordenarTarea(event: any) {
     const { previousIndex, currentIndex } = event;
     const item = this.formTareas.splice(previousIndex, 1)[0];
     this.formTareas.splice(currentIndex, 0, item);
   }
 
-  /** Guarda las tareas al guardar el proyecto */
   private guardarTareasDelProyecto(proyectoId: number): Promise<void> {
     const titulos = this.formTareas.filter(t => t.trim() !== '');
     if (titulos.length === 0) return Promise.resolve();
@@ -850,9 +798,6 @@ export class HomeAdminPage implements OnInit {
     });
   }
 
-  // ─────────────────────────────────────────────────────────────
-  // MODAL GESTIÓN ALUMNOS DEL PROYECTO
-  // ─────────────────────────────────────────────────────────────
 
   abrirModalAlumnosProyecto(p: proyecto) {
     this.proyectoGestionando = p;
@@ -894,7 +839,6 @@ export class HomeAdminPage implements OnInit {
     return this.usuarioIdToAlumnoId.has(usuarioId);
   }
 
-  // El backend devuelve UsuarioDTO donde `id` es el usuarioId
   estaInscrito(usuarioId: number): boolean {
     return this.alumnosDelProyecto.some(a => a.id === usuarioId);
   }
@@ -927,7 +871,6 @@ export class HomeAdminPage implements OnInit {
 
   quitarAlumnoDeProyecto(a: any) {
     if (!this.proyectoGestionando) return;
-    // a es un UsuarioDTO: a.id es el usuarioId
     const usuarioId: number = a.id;
     this.guardandoAlumnosProyecto = true;
     this.proyectoService.salir(usuarioId, this.proyectoGestionando.id).subscribe({

@@ -22,9 +22,7 @@ public class TareaService {
     private final ProyectoRepository        proyectoRepo;
     private final AlumnoRepository          alumnoRepo;
 
-    // ─── ADMIN: CRUD de tareas de un proyecto ────────────────────────────────
 
-    /** Devuelve la lista de tareas del proyecto (sin estado de completado) */
     public List<TareaProyectoDTO> getTareasPorProyecto(Long proyectoId) {
         return tareaRepo.findByProyectoIdOrderByOrdenAsc(proyectoId)
                 .stream()
@@ -32,17 +30,14 @@ public class TareaService {
                 .collect(Collectors.toList());
     }
 
-    /** Reemplaza por completo la lista de tareas del proyecto */
     @Transactional
     public List<TareaProyectoDTO> guardarTareas(Long proyectoId, List<String> titulos) {
         Proyecto proyecto = proyectoRepo.findById(proyectoId)
                 .orElseThrow(() -> new ElementoNoEncontradoException("Proyecto no encontrado: " + proyectoId));
 
-        // Borramos las existentes (CASCADE borra también tarea_completada)
         tareaRepo.deleteByProyectoId(proyectoId);
         tareaRepo.flush();
 
-        // Creamos las nuevas en orden
         List<TareaProyecto> nuevas = new java.util.ArrayList<>();
         for (int i = 0; i < titulos.size(); i++) {
             String t = titulos.get(i).trim();
@@ -56,12 +51,8 @@ public class TareaService {
         return nuevas.stream().map(this::toDTO).collect(Collectors.toList());
     }
 
-    // ─── ALUMNO: consultar tareas con su estado de completado ────────────────
 
-    /**
-     * Devuelve las tareas del proyecto con el campo `completada`
-     * relleno según el estado del alumno identificado por usuarioId.
-     */
+
     public List<TareaProyectoDTO> getTareasConEstado(Long proyectoId, Long usuarioId) {
         Alumno alumno = alumnoRepo.findByUsuarioId(usuarioId)
                 .orElseThrow(() -> new ElementoNoEncontradoException(
@@ -69,7 +60,6 @@ public class TareaService {
 
         List<TareaProyecto> tareas = tareaRepo.findByProyectoIdOrderByOrdenAsc(proyectoId);
 
-        // Set de IDs completadas por este alumno
         Set<Long> completadas = completadaRepo.findByAlumnoId(alumno.getId())
                 .stream()
                 .filter(TareaCompletada::getCompletada)
@@ -85,7 +75,6 @@ public class TareaService {
                 .collect(Collectors.toList());
     }
 
-    // ─── ALUMNO: marcar / desmarcar tarea ────────────────────────────────────
 
     @Transactional
     public void toggleTarea(Long tareaId, Long usuarioId, boolean completada) {
@@ -109,14 +98,13 @@ public class TareaService {
         completadaRepo.save(tc);
     }
 
-    // ─── Mapper ──────────────────────────────────────────────────────────────
     private TareaProyectoDTO toDTO(TareaProyecto t) {
         return new TareaProyectoDTO(
                 t.getId(),
                 t.getProyecto().getId(),
                 t.getTitulo(),
                 t.getOrden(),
-                null   // completada se rellena sólo cuando el alumno consulta
+                null
         );
     }
 }

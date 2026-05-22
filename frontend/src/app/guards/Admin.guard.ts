@@ -17,7 +17,6 @@ export const adminGuard: CanActivateFn = () => {
 
   return usuarioService.getUsuarioById(sesion.id).pipe(
     map((usuario) => {
-      // Sincronizar la sesión local con el rol real de la BD
       if (usuario.rol !== sesion.rol) {
         auth.guardarSesion({ ...sesion, rol: usuario.rol });
       }

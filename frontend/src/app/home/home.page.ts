@@ -54,11 +54,9 @@ export class HomePage implements OnInit {
   nuevoComentario: string = '';
   enviandoComentario = false;
 
-  // Chat
   comentarios: ComentarioDTO[] = [];
   loadingComentarios = false;
 
-  // Tareas del proyecto (alumno)
   tareasProyecto: TareaDTO[] = [];
   loadingTareas = false;
 
@@ -67,7 +65,6 @@ export class HomePage implements OnInit {
   nombreUsuario = '';
   asistenciaHoy: any = null;
 
-  // Horario del alumno para hoy
   horarioHoy: { horaInicio: string; horaFin: string } | null = null;
   franjaActiva: 'activa' | null = null;
 
@@ -76,7 +73,6 @@ export class HomePage implements OnInit {
   alumnoIdReal: number | null = null;
   formHorario = { horaInicio: '', horaFin: '' };
 
-  // Proyectos
   misProyectos: proyecto[] = [];
   nuevosProyectos: proyecto[] = [];
   misProyectosFiltrados: proyecto[] = [];
@@ -115,9 +111,7 @@ export class HomePage implements OnInit {
     this.cargarHorarioYFichaje();
   }
 
-  // ─────────────────────────────────────────────────────────────
-  // HORARIO Y FICHAJE
-  // ─────────────────────────────────────────────────────────────
+
   cargarHorarioYFichaje() {
     const sesion = this.authService.obtenerSesion();
     if (!sesion?.id) return;
@@ -220,9 +214,6 @@ export class HomePage implements OnInit {
     });
   }
 
-  // ─────────────────────────────────────────────────────────────
-  // GUARDAR HORARIO
-  // ─────────────────────────────────────────────────────────────
   async guardarHorario() {
     if (!this.alumnoIdReal || !this.formHorario.horaInicio || !this.formHorario.horaFin) {
       const toast = await this.toastController.create({
@@ -266,9 +257,7 @@ export class HomePage implements OnInit {
     });
   }
 
-  // ─────────────────────────────────────────────────────────────
-  // PROYECTOS
-  // ─────────────────────────────────────────────────────────────
+
   cargarProyectos() {
     const sesion = this.authService.obtenerSesion();
     if (!sesion?.id) { this.loadingProyectos = false; return; }
@@ -312,9 +301,6 @@ export class HomePage implements OnInit {
     ));
   }
 
-  // ─────────────────────────────────────────────────────────────
-  // HELPERS DE PROYECTOS
-  // ─────────────────────────────────────────────────────────────
   private ordenarPorEstado(proyectos: proyecto[]): proyecto[] {
     const prioridad: Record<string, number> = { 'en curso': 0, 'pausado': 1, 'finalizado': 2 };
     return [...proyectos].sort((a, b) =>
@@ -365,9 +351,7 @@ export class HomePage implements OnInit {
     return 'Inscribirse';
   }
 
-  // ─────────────────────────────────────────────────────────────
-  // FICHAJE
-  // ─────────────────────────────────────────────────────────────
+
   async fichar() {
     if (!this.alumnoIdReal) return;
 
@@ -419,9 +403,7 @@ export class HomePage implements OnInit {
     });
   }
 
-  // ─────────────────────────────────────────────────────────────
-  // INSCRIBIRSE / SALIR
-  // ─────────────────────────────────────────────────────────────
+
   async inscribirse(p: proyecto) {
     if (p.cuposDisponibles <= 0) {
       const toast = await this.toastController.create({
@@ -479,9 +461,7 @@ export class HomePage implements OnInit {
     });
   }
 
-  // ─────────────────────────────────────────────────────────────
-  // VER DETALLES / MODAL
-  // ─────────────────────────────────────────────────────────────
+
   verDetalles(p: any, inscrito: boolean) {
     this.proyectoSeleccionado = { ...p, alumnos: [] };
     this.esProyectoInscrito = inscrito;
@@ -520,9 +500,7 @@ export class HomePage implements OnInit {
     }
   }
 
-  // ─────────────────────────────────────────────────────────────
-  // CHAT
-  // ─────────────────────────────────────────────────────────────
+
   cargarComentarios(proyectoId: number) {
     this.loadingComentarios = true;
     this.comentarioService.getByProyecto(proyectoId).subscribe({
@@ -607,9 +585,7 @@ export class HomePage implements OnInit {
     }, 60);
   }
 
-  // ─────────────────────────────────────────────────────────────
-  // TAREAS
-  // ─────────────────────────────────────────────────────────────
+
   toggleTarea(tarea: TareaDTO) {
     const sesion = this.authService.obtenerSesion();
     if (!sesion?.id || !tarea.id) return;

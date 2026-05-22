@@ -17,16 +17,12 @@ public class ComentarioController {
 
     private final ComentarioService comentarioService;
 
-    /** GET /api/comentario/proyecto/{proyectoId} */
     @GetMapping("/proyecto/{proyectoId}")
     public ResponseEntity<List<ComentarioDTO>> getByProyecto(@PathVariable Long proyectoId) {
         return ResponseEntity.ok(comentarioService.getComentariosPorProyecto(proyectoId));
     }
 
-    /**
-     * POST /api/comentario
-     * Body: { "proyectoId": 1, "usuarioId": 3, "texto": "Hola!" }
-     */
+
     @PostMapping
     public ResponseEntity<ComentarioDTO> crear(@RequestBody Map<String, Object> body) {
         Long   proyectoId = Long.valueOf(body.get("proyectoId").toString());
@@ -36,10 +32,7 @@ public class ComentarioController {
                 .body(comentarioService.crear(proyectoId, usuarioId, texto));
     }
 
-    /**
-     * DELETE /api/comentario/{id}
-     * Body: { "usuarioId": 3 }
-     */
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(
             @PathVariable Long id,

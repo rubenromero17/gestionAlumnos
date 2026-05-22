@@ -10,7 +10,7 @@ export interface ComentarioDTO {
   nombreUsuario: string;
   fotoUsuario?: string;
   texto: string;
-  fecha: string; // ISO string
+  fecha: string;
 }
 
 @Injectable({ providedIn: 'root' })

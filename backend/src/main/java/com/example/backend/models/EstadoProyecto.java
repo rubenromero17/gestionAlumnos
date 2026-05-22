@@ -14,11 +14,9 @@ public enum EstadoProyecto {
 
     EstadoProyecto(String valor) { this.valor = valor; }
 
-    /** Jackson usa este valor al serializar a JSON (e.g. "en curso") */
     @JsonValue
     public String getValor() { return valor; }
 
-    /** Jackson llama este método al deserializar desde JSON */
     @JsonCreator
     public static EstadoProyecto fromValor(String valor) {
         if (valor == null) return null;

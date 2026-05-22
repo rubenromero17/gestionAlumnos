@@ -62,7 +62,6 @@
                 <div class="fichar-card">
                   <p class="instruction-text">Registra tu asistencia</p>
 
-                  <!-- Si no ha fichado entrada -->
                   <ng-container *ngIf="!asistenciaHoy">
                     <ion-button
                       class="fichar-button"
@@ -79,7 +78,6 @@
                     </span>
                   </ng-container>
 
-                  <!-- Si ya fichó entrada pero no salida -->
                   <ng-container *ngIf="asistenciaHoy && !asistenciaHoy.horaSalida">
                     <ion-button
                       class="fichar-button"
@@ -93,7 +91,6 @@
                     </span>
                   </ng-container>
 
-                  <!-- Si ya fichó salida -->
                   <ng-container *ngIf="asistenciaHoy && asistenciaHoy.horaSalida">
                     <div class="fichado-completado" style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px;">
                       <ion-icon name="checkmark-done-circle" color="success" style="font-size: 36px;"></ion-icon>
@@ -288,7 +285,6 @@
                 <div class="progress-fill" [style.width.%]="getPorcentajeCupo(proyectoSeleccionado)"></div>
               </div>
 
-              <!-- Barra de progreso de tareas (solo alumnos inscritos) -->
               <ng-container *ngIf="esProyectoInscrito && (tareasProyecto.length > 0 || loadingTareas)">
 
                 <div class="tareas-divider"></div>
@@ -303,19 +299,16 @@
                   </span>
                 </div>
 
-                <!-- Barra -->
                 <div class="tareas-progress-track" *ngIf="tareasProyecto.length > 0">
                   <div class="tareas-progress-fill" [style.width.%]="tareasProgresoPct()"></div>
                 </div>
                 <div class="tareas-pct" *ngIf="tareasProyecto.length > 0">{{ tareasProgresoPct() }}% completado</div>
 
-                <!-- Loading -->
                 <div class="tareas-loading" *ngIf="loadingTareas">
                   <ion-icon name="hourglass-outline"></ion-icon>
                   Cargando tareas...
                 </div>
 
-                <!-- Lista -->
                 <div class="tareas-lista" *ngIf="!loadingTareas && tareasProyecto.length > 0">
                   <div
                     *ngFor="let tarea of tareasProyecto"
@@ -368,38 +361,32 @@
 
               <div class="comments-feed" #chatFeed>
 
-                <!-- Loading -->
                 <div class="chat-loading" *ngIf="loadingComentarios">
                   <ion-icon name="hourglass-outline"></ion-icon>
                   <span>Cargando mensajes...</span>
                 </div>
 
-                <!-- Vacío -->
                 <div *ngIf="!loadingComentarios && comentarios.length === 0" class="empty-chat">
                   <ion-icon name="chatbubble-ellipses-outline" class="empty-chat-icon"></ion-icon>
                   <p class="empty-chat-text">Sé el primero en escribir algo.</p>
                 </div>
 
-                <!-- Mensajes -->
                 <div
                   *ngFor="let c of comentarios"
                   class="comment-row"
                   [class.comment-row-mine]="esMiMensaje(c)">
 
-                  <!-- Avatar -->
                   <div class="comment-avatar" *ngIf="!esMiMensaje(c)">
                     <img *ngIf="c.fotoUsuario" [src]="c.fotoUsuario" alt="avatar" />
                     <ion-icon *ngIf="!c.fotoUsuario" name="person-outline"></ion-icon>
                   </div>
 
-                  <!-- Burbuja -->
                   <div class="comment-bubble-wrap">
                     <span class="comment-author" *ngIf="!esMiMensaje(c)">{{ c.nombreUsuario }}</span>
                     <div class="comment-bubble">
                       <p class="comment-text">{{ c.texto }}</p>
                       <span class="comment-time">{{ formatearFecha(c.fecha) }}</span>
                     </div>
-                    <!-- Botón borrar solo para mensajes propios -->
                     <button
                       class="comment-delete-btn"
                       *ngIf="esMiMensaje(c)"

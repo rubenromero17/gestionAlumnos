@@ -1,12 +1,9 @@
-// Variables
 $primary-color: #3880ff;
 $primary-gradient: linear-gradient(135deg, #667eea 0%, #4a64fa 100%);
 $glass-bg: rgba(255, 255, 255, 0.1);
 $bg-app: #f4f7fe;
 
-// ==========================================
-// HEADER INTERACTIVO
-// ==========================================
+
 .main-header {
   --background: #416ff0;
   background: $primary-gradient;
@@ -26,11 +23,10 @@ $bg-app: #f4f7fe;
   }
 }
 
-// Nueva sección para alinear icono + texto
 .brand-section {
   display: flex;
   align-items: center;
-  gap: 12px; // Espacio entre la flecha y el nombre
+  gap: 12px;
 
   .back-icon {
     font-size: 1.6rem;
@@ -39,8 +35,8 @@ $bg-app: #f4f7fe;
     transition: all 0.2s ease;
 
     &:hover {
-      transform: translateX(-4px); // Efecto visual de retroceso
-      color: #a1c4fd; // Color a juego con el span del logo
+      transform: translateX(-4px);
+      color: #a1c4fd;
     }
   }
 }

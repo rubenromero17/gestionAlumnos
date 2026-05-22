@@ -12,7 +12,6 @@ public class AsignacionDTO {
     private Integer alumnoId;
     private Integer proyectoId;
 
-    // Datos extra útiles para mostrar en el frontend
     private String nombreAlumno;
     private String tituloProyecto;
 }

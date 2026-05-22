@@ -39,7 +39,6 @@ public class AsistenciaService {
     }
 
     public AsistenciaDTO registrar(AsistenciaDTO dto) {
-        // Si ya fichó hoy, devolver el registro existente sin duplicar
         return asistenciaRepository
                 .findByAlumnoIdAndFecha(dto.getAlumnoId(), LocalDate.now())
                 .map(asistenciaMapper::toDTO)

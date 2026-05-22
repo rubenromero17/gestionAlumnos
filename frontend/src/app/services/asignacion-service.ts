@@ -17,22 +17,18 @@ export class AsignacionService {
 
   constructor(private http: HttpClient) {}
 
-  /** Todos los alumnos (como UsuarioDTO) inscritos en un proyecto */
   getAlumnosPorProyecto(proyectoId: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.base}/proyecto/${proyectoId}`);
   }
 
-  /** Proyectos en los que está inscrito un usuario (por su usuarioId) */
   getProyectosPorUsuario(usuarioId: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.base}/alumno/${usuarioId}`);
   }
 
-  /** Inscribir un alumno (por usuarioId) en un proyecto */
   inscribir(alumnoId: number, proyectoId: number): Observable<AsignacionDTO> {
     return this.http.post<AsignacionDTO>(this.base, { alumnoId, proyectoId });
   }
 
-  /** Eliminar a un alumno (por usuarioId) de un proyecto */
   salir(alumnoId: number, proyectoId: number): Observable<void> {
     return this.http.delete<void>(this.base, {
       body: { alumnoId, proyectoId }

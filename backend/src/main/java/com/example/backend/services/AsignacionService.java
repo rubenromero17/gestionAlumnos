@@ -59,7 +59,6 @@ public class AsignacionService {
                 .map(asignacionMapper::toDTO);
     }
 
-    // Devuelve los proyectos en los que el usuario (por su usuarioId) está inscrito
     public List<ProyectoDTO> getProyectosPorUsuario(Long usuarioId) {
         Alumno alumno = alumnoRepository.findByUsuarioId(usuarioId)
                 .orElseThrow(() -> new ElementoNoEncontradoException(
@@ -114,8 +113,6 @@ public class AsignacionService {
     }
 
     public List<UsuarioDTO> findUsuariosByProyecto(Long proyectoId) {
-        // Asumiendo que tu repositorio tiene un método findByProyectoId()
-        // y que tu entidad Asignacion tiene acceso al Alumno y luego al Usuario
         return asignacionRepository.findByProyectoId(proyectoId).stream()
                 .map(asignacion -> asignacion.getAlumno().getUsuario())
                 .map(usuarioMapper::toDTO)

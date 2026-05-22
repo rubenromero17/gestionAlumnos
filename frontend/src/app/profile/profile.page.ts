@@ -50,12 +50,10 @@ export class ProfilePage implements OnInit {
   modalidadIdSeleccionada: number | null = null;
   nuevaModalidadNombre = '';
 
-  // ── HORARIO ──────────────────────────────────────────────────
   alumnoIdReal: number | null = null;
-  horariosActuales: any[] = [];           // horarios cargados de BD
+  horariosActuales: any[] = [];
   nuevoHorario = { horaInicio: '', horaFin: '' };
   guardandoHorario = false;
-  // ─────────────────────────────────────────────────────────────
 
   userData = {
     nombre_real: '',
@@ -93,7 +91,6 @@ export class ProfilePage implements OnInit {
   }
 
   ngOnInit(): void {
-    // Inicializar estado del dark mode desde el body
     this.darkMode = document.body.classList.contains('ion-palette-dark');
 
     const sesion = this.authService.obtenerSesion();
@@ -146,7 +143,6 @@ export class ProfilePage implements OnInit {
       }
     });
 
-    // Cargar alumnoId y horario actual
     this.alumnoService.getAlumnoByUsuarioId(sesion.id).subscribe({
       next: (alumno: any) => {
         const alumnoId: number = alumno.alumnoId ?? alumno.id;
@@ -154,19 +150,15 @@ export class ProfilePage implements OnInit {
         this.alumnoIdReal = alumnoId;
         this.cargarHorarios(alumnoId);
       },
-      error: () => {} // usuario sin perfil alumno → sección horario no se muestra
+      error: () => {}
     });
   }
 
-  // ──────────────────────────────────────────────
-  // HORARIO
-  // ──────────────────────────────────────────────
 
   cargarHorarios(alumnoId: number): void {
     this.alumnoService.getHorarioAlumno(alumnoId).subscribe({
       next: (horarios) => {
         this.horariosActuales = horarios;
-        // Pre-rellenar el formulario con el horario existente (si tiene)
         if (horarios.length > 0) {
           this.nuevoHorario.horaInicio = horarios[0].horaInicio;
           this.nuevoHorario.horaFin = horarios[0].horaFin;
@@ -184,7 +176,6 @@ export class ProfilePage implements OnInit {
 
     this.guardandoHorario = true;
 
-    // 1. Borrar todos los horarios actuales
     const borrados = this.horariosActuales.map(h =>
       this.alumnoService.deleteHorario(h.id)
     );
@@ -217,19 +208,14 @@ export class ProfilePage implements OnInit {
       forkJoin(borrados).subscribe({
         next: () => guardarNuevos(),
         error: async () => {
-          // Si algún borrado falla, intentamos igualmente crear los nuevos
           guardarNuevos();
         }
       });
     } else {
-      // No había horarios previos → crear directamente
       guardarNuevos();
     }
   }
 
-  // ──────────────────────────────────────────────
-  // MODALIDADES
-  // ──────────────────────────────────────────────
 
   cargarModalidades(): void {
     this.modalidadService.getModalidades().subscribe({
@@ -274,9 +260,7 @@ export class ProfilePage implements OnInit {
     });
   }
 
-  // ──────────────────────────────────────────────
-  // FOTO
-  // ──────────────────────────────────────────────
+
 
   onFotoSeleccionada(event: Event) {
     const input = event.target as HTMLInputElement;
@@ -345,9 +329,7 @@ export class ProfilePage implements OnInit {
     });
   }
 
-  // ──────────────────────────────────────────────
-  // GUARDAR CAMBIOS DE PERFIL
-  // ──────────────────────────────────────────────
+
 
   async guardarCambios() {
     const sesion = this.authService.obtenerSesion();
@@ -387,9 +369,6 @@ export class ProfilePage implements OnInit {
     });
   }
 
-  // ──────────────────────────────────────────────
-  // CAMBIO DE CONTRASEÑA
-  // ──────────────────────────────────────────────
 
   abrirModalPassword() {
     this.passwordData = { actual: '', nueva: '', confirmar: '' };
@@ -445,9 +424,7 @@ export class ProfilePage implements OnInit {
     });
   }
 
-  // ──────────────────────────────────────────────
-  // UTILIDADES
-  // ──────────────────────────────────────────────
+
 
   async presentToast(mensaje: string, color: string) {
     const toast = await this.toastController.create({

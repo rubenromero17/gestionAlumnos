@@ -15,12 +15,10 @@ export class AlumnoService {
     return this.http.get<alumno[]>(`${this.apiService.apiUrl}/alumno`);
   }
 
-  // Busca por alumno.id
   getAlumnoById(id: number): Observable<alumno> {
     return this.http.get<alumno>(`${this.apiService.apiUrl}/alumno/${id}`);
   }
 
-  // Busca el alumno asociado a un usuario (por usuario.id de sesión)
   getAlumnoByUsuarioId(usuarioId: number): Observable<alumno> {
     return this.http.get<alumno>(`${this.apiService.apiUrl}/alumno/usuario/${usuarioId}`);
   }
@@ -37,7 +35,6 @@ export class AlumnoService {
     return this.http.post<any>(`${this.apiService.apiUrl}/horario`, horario);
   }
 
-  // Elimina un horario concreto por su id
   deleteHorario(horarioId: number): Observable<void> {
     return this.http.delete<void>(`${this.apiService.apiUrl}/horario/${horarioId}`);
   }

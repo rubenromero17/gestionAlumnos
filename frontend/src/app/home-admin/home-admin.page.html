@@ -4,9 +4,7 @@
   <div class="home-wrapper">
     <div class="content-container">
 
-      <!-- ... (Mantengo toda tu sección de Attendance Hero sin cambios) ... -->
       <section class="attendance-section" [class.exit-animation]="isExiting">
-        <!-- Tu código original del hero card completo -->
         <ion-card class="attendance-hero-card">
           <div class="hero-bg-shapes">
             <div class="shape shape-1"></div>
@@ -14,7 +12,6 @@
             <div class="shape shape-3"></div>
           </div>
           <div class="attendance-content">
-            <!-- COLUMNA IZQUIERDA -->
             <div class="left-column">
               <div class="user-greeting">
                 <span class="greeting-label">Panel de Control</span>
@@ -44,7 +41,6 @@
               </div>
 
               <div class="horario-form-box" *ngIf="mostrarTarjetaAsistencia && mostrarFormHorario">
-                <!-- Tu formulario de horario sin cambios -->
                 <div class="horario-form-header">
                   <ion-icon name="calendar-outline"></ion-icon>
                   <span>No tienes horario para hoy. Añade uno:</span>
@@ -72,12 +68,10 @@
               </div>
             </div>
 
-            <!-- COLUMNA DERECHA -->
             <div class="right-column">
               <div class="fichar-card" *ngIf="mostrarTarjetaAsistencia && !mostrarFormHorario">
                 <p class="instruction-text">Registra tu asistencia</p>
 
-                <!-- Si no ha fichado entrada -->
                 <ng-container *ngIf="!asistenciaHoy">
                   <ion-button class="fichar-button" (click)="fichar()" [disabled]="franjaActiva === null">
                     <ion-icon name="log-in-outline" slot="start"></ion-icon>
@@ -89,7 +83,6 @@
                   </span>
                 </ng-container>
 
-                <!-- Si ya fichó entrada pero no salida -->
                 <ng-container *ngIf="asistenciaHoy && !asistenciaHoy.horaSalida">
                   <ion-button class="fichar-button" color="warning" (click)="desfichar()">
                     <ion-icon name="log-out-outline" slot="start"></ion-icon>
@@ -98,7 +91,6 @@
                   <span class="fichar-hint">Entrada registrada a las {{ asistenciaHoy.horaEntrada ? (asistenciaHoy.horaEntrada | slice:0:5) : '--:--' }}. Haz clic para registrar tu salida de hoy.</span>
                 </ng-container>
 
-                <!-- Si ya fichó salida -->
                 <ng-container *ngIf="asistenciaHoy && asistenciaHoy.horaSalida">
                   <div class="fichado-completado" style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px;">
                     <ion-icon name="checkmark-done-circle" color="success" style="font-size: 36px;"></ion-icon>
@@ -123,7 +115,6 @@
 
       <hr class="divider">
 
-      <!-- ==================== SECCIÓN USUARIOS ==================== -->
       <section>
         <div class="usuarios-header">
           <div class="usuarios-title-block">
@@ -148,7 +139,6 @@
           </div>
         </div>
 
-        <!-- LISTA DE USUARIOS CON DEGRADADO -->
         <div class="usuarios-lista-wrapper" *ngIf="!loadingUsuarios">
           <div class="usuarios-lista" [class.mostrar-todos]="mostrarTodosUsuarios">
             <div class="usuario-item" *ngFor="let u of filtroUsuarios | slice:0:mostrarTodosUsuarios ? 999 : 6">
@@ -169,13 +159,11 @@
                   Sin fichar
                 </div>
 
-                <!-- 2. Fichado (En curso): Tiene registro hoy pero no tiene hora de salida -->
                 <div *ngIf="obtenerAsistenciaAlumno(u.id) && !obtenerAsistenciaAlumno(u.id)?.horaSalida" class="fichado-badge" style="background: rgba(255, 196, 9, 0.12); color: #fcc409; border: 1px solid rgba(255, 196, 9, 0.25); display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; white-space: nowrap;">
                   <ion-icon name="time-outline" style="font-size: 16px;"></ion-icon>
                   Fichado ({{ obtenerAsistenciaAlumno(u.id)?.horaEntrada ? (obtenerAsistenciaAlumno(u.id)?.horaEntrada | slice:0:5) : '--:--' }})
                 </div>
 
-                <!-- 3. Terminado: Tiene registro hoy y tiene hora de salida -->
                 <div *ngIf="obtenerAsistenciaAlumno(u.id) && obtenerAsistenciaAlumno(u.id)?.horaSalida" class="fichado-badge" style="background: rgba(45, 211, 111, 0.12); color: #2dd36f; border: 1px solid rgba(45, 211, 111, 0.25); display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; white-space: nowrap;">
                   <ion-icon name="checkmark-done-circle" style="font-size: 16px; color: #2dd36f;"></ion-icon>
                   Terminado ({{ obtenerAsistenciaAlumno(u.id)?.horaEntrada ? (obtenerAsistenciaAlumno(u.id)?.horaEntrada | slice:0:5) : '--:--' }} - {{ obtenerAsistenciaAlumno(u.id)?.horaSalida ? (obtenerAsistenciaAlumno(u.id)?.horaSalida | slice:0:5) : '--:--' }})
@@ -205,7 +193,6 @@
           </div>
         </div>
 
-        <!-- Skeleton -->
         <div class="usuarios-lista" *ngIf="loadingUsuarios">
           <div class="usuario-item skeleton" *ngFor="let i of [1,2,3,4,5]">
             <div class="usuario-avatar skeleton-box"></div>
@@ -220,7 +207,6 @@
 
       <hr class="divider">
 
-      <!-- ==================== SECCIÓN PROYECTOS ==================== -->
       <section class="proyectos-section">
         <div class="usuarios-header">
           <div class="usuarios-title-block">
@@ -245,7 +231,6 @@
           </div>
         </div>
 
-        <!-- LISTA PROYECTOS CON DEGRADADO -->
         <div class="usuarios-lista-wrapper" *ngIf="!loadingProyectos">
           <div class="usuarios-lista" [class.mostrar-todos]="mostrarTodosProyectos">
             <div class="usuario-item proyecto-item" *ngFor="let p of filtroProyectos | slice:0:mostrarTodosProyectos ? 999 : 6">
@@ -291,7 +276,6 @@
           </div>
         </div>
 
-        <!-- Skeleton Proyectos -->
         <div class="usuarios-lista" *ngIf="loadingProyectos">
           <div class="usuario-item skeleton" *ngFor="let i of [1,2,3]">
             <div class="usuario-avatar skeleton-box"></div>
@@ -308,7 +292,6 @@
 
       <section class="afk-section">
 
-        <!-- Cabecera -->
         <div class="usuarios-header">
           <div class="usuarios-title-block">
             <h2 class="section-title" style="margin: 0;">Actividad anti-AFK de hoy</h2>
@@ -323,37 +306,31 @@
           </div>
         </div>
 
-        <!-- Estado de carga -->
         <div class="afk-loading" *ngIf="loadingAfk">
           <ion-icon name="hourglass-outline" class="afk-loading-icon"></ion-icon>
           <span>Cargando registros...</span>
         </div>
 
-        <!-- Lista vacía -->
         <div class="usuarios-vacio" *ngIf="!loadingAfk && registrosAfk.length === 0">
           <ion-icon name="checkmark-done-circle-outline"></ion-icon>
           <p>No hay registros de actividad para hoy.</p>
         </div>
 
-        <!-- Tabla de registros -->
         <div class="afk-tabla-wrapper" *ngIf="!loadingAfk && registrosAfk.length > 0">
           <div class="afk-tabla">
 
-            <!-- Cabecera tabla -->
             <div class="afk-row afk-row-header">
               <span>Usuario</span>
               <span>Hora del popup</span>
               <span>Resultado</span>
             </div>
 
-            <!-- Filas -->
             <div
               class="afk-row"
               *ngFor="let r of registrosAfk | slice:0:(mostrarTodosAfk ? 9999 : 8)"
               [class.afk-row-respondio]="r.respondido"
               [class.afk-row-afk]="!r.respondido"
             >
-              <!-- Nombre del usuario -->
               <span class="afk-usuario">
           <div class="afk-avatar">
             <ion-icon [name]="getIconoPorUsuarioId(r.usuarioId)"></ion-icon>
@@ -364,13 +341,11 @@
           </div>
         </span>
 
-              <!-- Hora -->
               <span class="afk-hora">
           <ion-icon name="time-outline"></ion-icon>
                 {{ r.hora }}
         </span>
 
-              <!-- Badge resultado -->
               <span class="afk-resultado">
           <span class="afk-badge" [class.afk-si]="r.respondido" [class.afk-no]="!r.respondido">
             <ion-icon [name]="r.respondido ? 'checkmark-circle-outline' : 'close-circle-outline'"></ion-icon>
@@ -380,7 +355,6 @@
             </div>
           </div>
 
-          <!-- Ver más -->
           <div class="ver-todo-container" *ngIf="registrosAfk.length > 8">
             <button class="ver-todo-btn" (click)="mostrarTodosAfk = !mostrarTodosAfk">
               {{ mostrarTodosAfk ? 'Ver menos' : 'Ver todos (' + registrosAfk.length + ')' }}
@@ -394,12 +368,7 @@
   </div>
 </ion-content>
 
-<!-- Modales (sin cambios) -->
-<!-- ... (Mantén todos tus modales: Cambio Masivo, Proyecto, Edición Usuario) ... -->
 
-<!-- ========================================================= -->
-<!-- MODAL CAMBIO MASIVO DE ROL                                -->
-<!-- ========================================================= -->
 <div class="modal-overlay" *ngIf="modalCambioMasivoAbierto" (click)="cerrarModalCambioMasivoRol()">
   <div class="modal-card modal-masivo" (click)="$event.stopPropagation()">
 
@@ -422,7 +391,6 @@
 
     <div class="modal-body">
 
-      <!-- Selector de rol destino -->
       <div class="form-group">
         <label class="form-label">URL del video explicativo</label>
         <input class="form-input" type="url" [(ngModel)]="formProyecto.videoUrl" placeholder="" />
@@ -433,7 +401,6 @@
         </select>
       </div>
 
-      <!-- Buscador -->
       <div class="masivo-search-wrapper">
         <ion-icon name="search-outline" class="masivo-search-icon"></ion-icon>
         <input
@@ -450,7 +417,6 @@
         </button>
       </div>
 
-      <!-- Acciones rápidas de selección -->
       <div class="masivo-acciones-rapidas">
         <button class="filtro-btn" (click)="seleccionarTodosMasivo()">Seleccionar todos</button>
         <button class="filtro-btn" (click)="deseleccionarTodosMasivo()">Limpiar selección</button>
@@ -458,7 +424,6 @@
         <button class="filtro-btn filtro-admin" (click)="seleccionarPorRolMasivo('administrador')">Solo admins</button>
       </div>
 
-      <!-- Lista de usuarios seleccionables -->
       <div class="masivo-lista">
         <div
           class="masivo-item"
@@ -483,7 +448,6 @@
           </div>
         </div>
 
-        <!-- Vacío búsqueda -->
         <div class="masivo-vacio" *ngIf="usuariosFiltradosMasivo.length === 0">
           <ion-icon name="search-outline"></ion-icon>
           <p>Sin resultados para "{{ busquedaMasivo }}"</p>
@@ -507,9 +471,7 @@
   </div>
 </div>
 
-<!-- ========================================================= -->
-<!-- MODAL CREAR / EDITAR PROYECTO                             -->
-<!-- ========================================================= -->
+
 <div class="modal-overlay" *ngIf="modalProyectoAbierto" (click)="cerrarModalProyecto()">
   <div class="modal-card" (click)="$event.stopPropagation()">
 
@@ -586,7 +548,6 @@
         <input class="form-input" type="url" [(ngModel)]="formProyecto.videoUrl" placeholder="https://youtube.com/..." />
       </div>
 
-      <!-- ── TAREAS DEL PROYECTO ── -->
       <div class="form-group tareas-admin-section" *ngIf="proyectoEditando">
         <label class="form-label tareas-label">
           <ion-icon name="checkbox-outline"></ion-icon>
@@ -641,9 +602,7 @@
   </div>
 </div>
 
-<!-- ========================================================= -->
-<!-- MODAL GESTIÓN ALUMNOS DEL PROYECTO                        -->
-<!-- ========================================================= -->
+
 <div class="modal-overlay" *ngIf="modalAlumnosProyectoAbierto" (click)="cerrarModalAlumnosProyecto()">
   <div class="modal-card modal-card-alumnos" (click)="$event.stopPropagation()">
 
@@ -664,7 +623,6 @@
 
     <div class="modal-body modal-body-alumnos">
 
-      <!-- Inscritos actuales -->
       <div class="alumnos-seccion">
         <div class="alumnos-seccion-header">
           <span class="alumnos-seccion-title">
@@ -703,7 +661,6 @@
 
       <hr class="alumnos-divider">
 
-      <!-- Buscador para agregar -->
       <div class="alumnos-seccion">
         <div class="alumnos-seccion-header">
           <span class="alumnos-seccion-title">
@@ -772,9 +729,7 @@
   </div>
 </div>
 
-<!-- ========================================================= -->
-<!-- MODAL EDICIÓN USUARIO (sin cambios)                       -->
-<!-- ========================================================= -->
+
 <div class="modal-overlay" *ngIf="modalEdicionAbierto" (click)="cerrarModalEdicion()">
   <div class="modal-card" (click)="$event.stopPropagation()">
 

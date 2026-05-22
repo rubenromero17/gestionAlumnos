@@ -9,7 +9,7 @@
 
 .interactive-card {
   width: 100%;
-  max-width: 850px; // Un poco más ancha por tener más campos
+  max-width: 850px;
   background: #ffffff;
   border-radius: 20px;
   padding: 15px;
@@ -76,7 +76,7 @@
   margin-top: 20px;
   margin-bottom: 15px;
   height: 55px;
-  --background: #764ba2; // Color acorde al degradado
+  --background: #764ba2;
   font-weight: bold;
 }
 
@@ -103,7 +103,6 @@ ion-note {
   }
 }
 
-// ==================== DARK MODE OVERRIDES ====================
 :host-context(body.ion-palette-dark) {
 
   .login-wrapper {

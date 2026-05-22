@@ -17,7 +17,6 @@ public class ProyectoController {
     @Autowired
     private ProyectoService proyectoService;
 
-    // ─── READ ────────────────────────────────────────────────────────────────
 
     @GetMapping
     public List<ProyectoDTO> findAll() {
@@ -31,25 +30,21 @@ public class ProyectoController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // Proyectos en curso o pausados donde el alumno está inscrito
     @GetMapping("/alumno/{alumnoId}/activos")
     public List<ProyectoDTO> findActivosByAlumno(@PathVariable Long alumnoId) {
         return proyectoService.findActivosByAlumno(alumnoId);
     }
 
-    // Proyectos finalizados donde el alumno está inscrito
     @GetMapping("/alumno/{alumnoId}/finalizados")
     public List<ProyectoDTO> findFinalizadosByAlumno(@PathVariable Long alumnoId) {
         return proyectoService.findFinalizadosByAlumno(alumnoId);
     }
 
-    // Proyectos donde el alumno NO está inscrito
     @GetMapping("/alumno/{alumnoId}/explorar")
     public List<ProyectoDTO> findNoInscritosByAlumno(@PathVariable Long alumnoId) {
         return proyectoService.findNoInscritosByAlumno(alumnoId);
     }
 
-    // ─── CREATE ──────────────────────────────────────────────────────────────
 
     @PostMapping
     public ResponseEntity<ProyectoDTO> create(@RequestBody ProyectoDTO dto) {
@@ -57,7 +52,6 @@ public class ProyectoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(creado);
     }
 
-    // ─── UPDATE ──────────────────────────────────────────────────────────────
 
     @PutMapping("/{id}")
     public ResponseEntity<ProyectoDTO> update(@PathVariable Long id, @RequestBody ProyectoDTO dto) {
@@ -66,7 +60,6 @@ public class ProyectoController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // ─── DELETE ──────────────────────────────────────────────────────────────
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {

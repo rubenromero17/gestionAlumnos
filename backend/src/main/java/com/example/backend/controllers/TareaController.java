@@ -16,19 +16,13 @@ public class TareaController {
 
     private final TareaService tareaService;
 
-    // ── ADMIN ─────────────────────────────────────────────────────────────────
 
-    /** GET /api/tarea/proyecto/{proyectoId}  → lista de tareas sin estado alumno */
     @GetMapping("/proyecto/{proyectoId}")
     public ResponseEntity<List<TareaProyectoDTO>> getTareas(@PathVariable Long proyectoId) {
         return ResponseEntity.ok(tareaService.getTareasPorProyecto(proyectoId));
     }
 
-    /**
-     * PUT /api/tarea/proyecto/{proyectoId}
-     * Body: { "titulos": ["Tarea 1", "Tarea 2", ...] }
-     * Reemplaza toda la lista de tareas del proyecto.
-     */
+
     @PutMapping("/proyecto/{proyectoId}")
     public ResponseEntity<List<TareaProyectoDTO>> guardarTareas(
             @PathVariable Long proyectoId,
@@ -39,10 +33,7 @@ public class TareaController {
 
     // ── ALUMNO ────────────────────────────────────────────────────────────────
 
-    /**
-     * GET /api/tarea/proyecto/{proyectoId}/usuario/{usuarioId}
-     * Devuelve las tareas con el campo `completada` según el alumno.
-     */
+
     @GetMapping("/proyecto/{proyectoId}/usuario/{usuarioId}")
     public ResponseEntity<List<TareaProyectoDTO>> getTareasConEstado(
             @PathVariable Long proyectoId,
@@ -50,10 +41,7 @@ public class TareaController {
         return ResponseEntity.ok(tareaService.getTareasConEstado(proyectoId, usuarioId));
     }
 
-    /**
-     * PATCH /api/tarea/{tareaId}/usuario/{usuarioId}
-     * Body: { "completada": true | false }
-     */
+
     @PatchMapping("/{tareaId}/usuario/{usuarioId}")
     public ResponseEntity<Void> toggleTarea(
             @PathVariable Long tareaId,

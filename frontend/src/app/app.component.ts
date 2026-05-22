@@ -14,12 +14,10 @@ export class AppComponent implements OnInit {
   constructor(private authService: AuthService) {}
 
   ngOnInit(): void {
-    // ── Restaurar preferencia de modo oscuro ──
     const darkPref = localStorage.getItem('darkMode');
     if (darkPref === 'true') {
       document.body.classList.add('ion-palette-dark');
     } else if (darkPref === null) {
-      // Sin preferencia guardada → respetar la del sistema
       if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
         document.body.classList.add('ion-palette-dark');
       }

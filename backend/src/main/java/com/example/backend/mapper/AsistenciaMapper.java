@@ -15,7 +15,7 @@ import java.util.List;
 public abstract class AsistenciaMapper {
 
     @Autowired
-    private AlumnoRepository alumnoRepository;  // ← inyectar el repositorio
+    private AlumnoRepository alumnoRepository;
 
     @Mapping(source = "alumno.id", target = "alumnoId")
     public abstract AsistenciaDTO toDTO(Asistencia asistencia);
@@ -32,6 +32,5 @@ public abstract class AsistenciaMapper {
         if (alumnoId == null) return null;
         return alumnoRepository.findById(alumnoId)
                 .orElseThrow(() -> new RuntimeException("Alumno no encontrado con id: " + alumnoId));
-        // ↑ igual que HorarioMapper — devuelve la entidad gestionada por JPA
     }
 }

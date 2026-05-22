@@ -13,7 +13,6 @@ $bg-app: #f4f7fe;
   padding: 0 20px;
 }
 
-// LÓGICA DE ANIMACIÓN FICHAJE
 .attendance-section {
   margin-bottom: 30px;
   animation: fadeInDown 0.6s ease-out forwards;
@@ -33,7 +32,6 @@ $bg-app: #f4f7fe;
     box-shadow: 0 20px 50px rgba(45, 31, 61, 0.4);
     border: none;
 
-    // Formas decorativas de fondo
     .hero-bg-shapes {
       position: absolute;
       inset: 0;
@@ -199,7 +197,6 @@ $bg-app: #f4f7fe;
   }
 }
 
-// ── FORMULARIO DE HORARIO ────────────────────────────────────
 .horario-form-box {
   background: rgba(255,255,255,0.08);
   border: 1px solid rgba(255,255,255,0.18);
@@ -273,9 +270,7 @@ $bg-app: #f4f7fe;
   }
 }
 
-// ==========================================
-// ESTILOS NUEVA SECCIÓN PROYECTOS
-// ==========================================
+
 .new-projects {
   padding-bottom: 50px;
 
@@ -322,7 +317,6 @@ $bg-app: #f4f7fe;
   }
 }
 
-// GENERALES
 .section-title { font-size: 1.8rem; font-weight: 800; color: #333; margin-bottom: 20px; }
 .divider { border: 0; height: 1px; background: rgba(0,0,0,0.1); margin: 40px 0; }
 .interactive-card {
@@ -445,9 +439,7 @@ $bg-app: #f4f7fe;
 .progress-chip { position: absolute; bottom: 10px; left: 12px; background: rgba(255,255,255,0.92); color: #764ba2; padding: 3px 10px; border-radius: 20px; font-weight: 700; font-size: 0.75rem; }
 
 
-// ==========================================
-// ESTILOS DEL MODAL DE DETALLES
-// ==========================================
+
 .project-modal {
   --height: 85%;
   --max-height: 85%;
@@ -460,7 +452,6 @@ $bg-app: #f4f7fe;
     --border-color: #f0eaf8;
   }
 
-  // FUERZA fondo blanco en el ion-content del modal
   ion-content {
     --background: #f8f5ff;
     --color: #2d1f3d;
@@ -520,7 +511,6 @@ $bg-app: #f4f7fe;
   }
 }
 
-// Etiquetas de sección genéricas
 .section-label {
   display: flex;
   align-items: center;
@@ -537,7 +527,6 @@ $bg-app: #f4f7fe;
   }
 }
 
-// 1. Estado de Avance
 .status-section {
   background: #ffffff;
   padding: 18px 20px;
@@ -578,7 +567,6 @@ $bg-app: #f4f7fe;
     margin-bottom: 0;
   }
 
-  // ── Bloque de tareas ────────────────────────────────────────
   .tareas-divider {
     margin: 16px 0 14px;
     height: 1px;
@@ -701,7 +689,6 @@ $bg-app: #f4f7fe;
   }
 }
 
-// 2. Características
 .features-section {
   background: #ffffff;
   padding: 16px 20px;
@@ -735,7 +722,6 @@ $bg-app: #f4f7fe;
   }
 }
 
-// 3. Bitácora / Chat
 .chat-section {
   background: #ffffff;
   padding: 16px 20px;
@@ -776,13 +762,11 @@ $bg-app: #f4f7fe;
     &::-webkit-scrollbar-thumb { background: rgba(118,75,162,0.2); border-radius: 4px; }
   }
 
-  // ── Fila de mensaje ──────────────────────────────────────────
   .comment-row {
     display: flex;
     align-items: flex-end;
     gap: 8px;
 
-    // Mensajes propios: empujar a la derecha
     &.comment-row-mine {
       flex-direction: row-reverse;
 
@@ -799,7 +783,6 @@ $bg-app: #f4f7fe;
     }
   }
 
-  // ── Avatar ───────────────────────────────────────────────────
   .comment-avatar {
     width: 32px;
     height: 32px;
@@ -823,7 +806,6 @@ $bg-app: #f4f7fe;
     }
   }
 
-  // ── Wrap burbuja + autor ──────────────────────────────────────
   .comment-bubble-wrap {
     display: flex;
     flex-direction: column;
@@ -841,7 +823,6 @@ $bg-app: #f4f7fe;
     padding-left: 4px;
   }
 
-  // ── Burbuja ──────────────────────────────────────────────────
   .comment-bubble {
     background: #f0eaf8;
     padding: 9px 13px 6px;
@@ -865,7 +846,6 @@ $bg-app: #f4f7fe;
     }
   }
 
-  // ── Botón borrar ─────────────────────────────────────────────
   .comment-delete-btn {
     opacity: 0;
     transition: opacity 0.15s;
@@ -879,7 +859,6 @@ $bg-app: #f4f7fe;
     ion-icon { font-size: 14px; }
   }
 
-  // ── Loading / vacío ──────────────────────────────────────────
   .chat-loading {
     display: flex;
     align-items: center;
@@ -908,7 +887,6 @@ $bg-app: #f4f7fe;
     .empty-chat-text { font-size: 0.88rem; margin: 0; }
   }
 
-  // ── Input de envío ───────────────────────────────────────────
   .chat-input-container {
     display: flex;
     align-items: center;
@@ -940,7 +918,6 @@ $bg-app: #f4f7fe;
   }
 }
 
-// ── ESTADO CHIP (reemplaza badge/progress-chip) ────────────────
 .estado-chip {
   position: absolute;
   top: 12px;
@@ -958,7 +935,6 @@ $bg-app: #f4f7fe;
   &.estado-finalizado { background: rgba(148,163,184,0.85);color: #fff; }
 }
 
-// ── META ROW (cupo) ────────────────────────────────────────────
 .meta-row {
   display: flex;
   gap: 12px;
@@ -975,7 +951,6 @@ $bg-app: #f4f7fe;
   ion-icon { font-size: 0.95rem; }
 }
 
-// ── LISTA VACÍA ────────────────────────────────────────────────
 .lista-vacia {
   width: 100%;
   padding: 40px 20px;
@@ -986,13 +961,11 @@ $bg-app: #f4f7fe;
   p { margin: 0; font-size: 0.9rem; }
 }
 
-// ── FICHAR HINT WARNING ───────────────────────────────────────────────────────
 .fichar-hint-warning {
   color: #ffc409 !important;
   font-weight: 500;
 }
 
-// ── DARK MODE OVERRIDES ──────────────────────────────────────
 :host-context(body.ion-palette-dark) {
 
   .home-wrapper {
@@ -1007,7 +980,6 @@ $bg-app: #f4f7fe;
     background: rgba(255, 255, 255, 0.08);
   }
 
-  // Project cards
   .project-card {
     --background: #241a33;
     border-color: #4a3660;
@@ -1031,7 +1003,6 @@ $bg-app: #f4f7fe;
     &:hover { box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4); }
   }
 
-  // New projects section
   .new-projects {
     .section-header .section-subtitle { color: #9a85b0; }
 
@@ -1041,7 +1012,6 @@ $bg-app: #f4f7fe;
     }
   }
 
-  // Modal
   .project-modal {
     ion-header ion-toolbar {
       --background: #241a33;
@@ -1070,7 +1040,6 @@ $bg-app: #f4f7fe;
 
   .section-label { color: #c4a7e7; }
 
-  // Status section in modal
   .status-section {
     background: #241a33;
     border-color: #4a3660;
@@ -1103,7 +1072,6 @@ $bg-app: #f4f7fe;
     }
   }
 
-  // Features section in modal
   .features-section {
     background: #241a33;
     border-color: #4a3660;
@@ -1115,7 +1083,6 @@ $bg-app: #f4f7fe;
     }
   }
 
-  // Chat section
   .chat-section {
     background: #241a33;
     border-color: #4a3660;

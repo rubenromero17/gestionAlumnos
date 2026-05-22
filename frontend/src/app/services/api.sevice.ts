@@ -5,7 +5,7 @@ import {HttpClient} from "@angular/common/http";
   providedIn: 'root'
 })
 export class ApiService {
-  public apiUrl = 'http://localhost:8080/api';  // ← cambiar protected por public
+  public apiUrl = 'http://localhost:8080/api';
 
   constructor(public http: HttpClient) {}
 }

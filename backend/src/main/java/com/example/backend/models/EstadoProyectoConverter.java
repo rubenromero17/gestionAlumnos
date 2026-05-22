@@ -15,7 +15,6 @@ public class EstadoProyectoConverter implements AttributeConverter<EstadoProyect
     public EstadoProyecto convertToEntityAttribute(String dbData) {
         if (dbData == null) return null;
 
-        // Buscamos el enum que coincida con el texto de la DB ('en curso', etc.)
         for (EstadoProyecto ep : EstadoProyecto.values()) {
             if (ep.getValor().equals(dbData)) {
                 return ep;

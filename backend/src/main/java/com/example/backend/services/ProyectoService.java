@@ -30,7 +30,6 @@ public class ProyectoService {
     @Autowired
     private ProyectoMapper proyectoMapper;
 
-    // ─── READ ────────────────────────────────────────────────────────────────
 
     public List<ProyectoDTO> findAll() {
         return proyectoRepository.findAll().stream()
@@ -42,7 +41,6 @@ public class ProyectoService {
         return proyectoRepository.findById(id).map(proyectoMapper::toDTO);
     }
 
-    // Proyectos 'en curso' o 'pausado' donde el alumno está inscrito
     @Transactional
     public List<ProyectoDTO> findActivosByAlumno(Long usuarioId) {
         Long alumnoId = alumnoRepository.findByUsuarioId(usuarioId)
@@ -71,7 +69,6 @@ public class ProyectoService {
                 }).collect(Collectors.toList());
     }
 
-    // Proyectos donde el alumno NO está inscrito
     @Transactional
     public List<ProyectoDTO> findNoInscritosByAlumno(Long usuarioId) {
         Long alumnoId = alumnoRepository.findByUsuarioId(usuarioId)
@@ -90,7 +87,6 @@ public class ProyectoService {
                 .filter(dto -> dto.getCuposDisponibles() > 0)
                 .collect(Collectors.toList());
     }
-    // ─── CREATE ──────────────────────────────────────────────────────────────
 
     public ProyectoDTO create(ProyectoDTO dto) {
         Proyecto proyecto = proyectoMapper.toEntity(dto);
@@ -98,7 +94,6 @@ public class ProyectoService {
         return proyectoMapper.toDTO(guardado);
     }
 
-    // ─── UPDATE ──────────────────────────────────────────────────────────────
 
     public Optional<ProyectoDTO> update(Long id, ProyectoDTO dto) {
         return proyectoRepository.findById(id).map(existing -> {
@@ -112,7 +107,6 @@ public class ProyectoService {
         });
     }
 
-    // ─── DELETE ──────────────────────────────────────────────────────────────
 
     public boolean delete(Long id) {
         if (!proyectoRepository.existsById(id)) {

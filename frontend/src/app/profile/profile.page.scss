@@ -437,7 +437,6 @@ ion-content {
   align-self: flex-end;
 }
 
-// ── Dark mode toggle ─────────────────────────────────────────
 .dark-mode-toggle-section {
   margin: 16px 10px 8px;
   padding: 14px 18px;
@@ -499,7 +498,6 @@ ion-content {
   transition: color 0.35s ease;
 }
 
-// ── DARK MODE OVERRIDES ──────────────────────────────────────
 :host-context(body.ion-palette-dark) {
 
   ion-content {
@@ -654,7 +652,6 @@ ion-content {
     }
   }
 
-  // Modal
   .project-modal {
     .modal-container {
       .modal-description-text { color: #9a85b0; }
