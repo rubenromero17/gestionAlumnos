@@ -266,6 +266,9 @@
                 {{ p.estado }}
               </div>
               <div class="usuario-acciones">
+                <ion-button fill="clear" size="small" class="accion-btn users-btn" (click)="abrirModalAlumnosProyecto(p)" title="Gestionar alumnos">
+                  <ion-icon name="people-outline" slot="icon-only"></ion-icon>
+                </ion-button>
                 <ion-button fill="clear" size="small" class="accion-btn edit-btn" (click)="abrirModalProyecto(p)">
                   <ion-icon name="pencil-outline" slot="icon-only"></ion-icon>
                 </ion-button>
@@ -632,6 +635,137 @@
         <ion-icon name="checkmark-outline" *ngIf="!guardandoProyecto"></ion-icon>
         <ion-icon name="hourglass-outline" *ngIf="guardandoProyecto"></ion-icon>
         {{ guardandoProyecto ? 'Guardando...' : (proyectoEditando ? 'Guardar cambios' : 'Crear proyecto') }}
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ========================================================= -->
+<!-- MODAL GESTIÓN ALUMNOS DEL PROYECTO                        -->
+<!-- ========================================================= -->
+<div class="modal-overlay" *ngIf="modalAlumnosProyectoAbierto" (click)="cerrarModalAlumnosProyecto()">
+  <div class="modal-card modal-card-alumnos" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <div class="modal-header-info">
+        <div class="modal-avatar" style="background: linear-gradient(135deg, #3880ff22, #3880ff44); color: #3880ff;">
+          <ion-icon name="people-outline"></ion-icon>
+        </div>
+        <div>
+          <h2 class="modal-title">Alumnos del proyecto</h2>
+          <span class="modal-subtitle">{{ proyectoGestionando?.titulo }}</span>
+        </div>
+      </div>
+      <ion-button fill="clear" class="modal-close-btn" (click)="cerrarModalAlumnosProyecto()">
+        <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </div>
+
+    <div class="modal-body modal-body-alumnos">
+
+      <!-- Inscritos actuales -->
+      <div class="alumnos-seccion">
+        <div class="alumnos-seccion-header">
+          <span class="alumnos-seccion-title">
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+            Inscritos
+          </span>
+          <span class="alumnos-count-badge">{{ alumnosDelProyecto.length }} / {{ proyectoGestionando?.cupoMaximo }}</span>
+        </div>
+
+        <div class="alumnos-inscritos-lista" *ngIf="alumnosDelProyecto.length > 0">
+          <div class="alumno-inscrito-row" *ngFor="let a of alumnosDelProyecto">
+            <div class="alumno-inscrito-avatar avatar-inscrito">
+              <ion-icon name="person-outline"></ion-icon>
+            </div>
+            <div class="alumno-inscrito-info">
+              <span class="alumno-inscrito-nombre">{{ a.nombreReal }}</span>
+              <span class="alumno-inscrito-id">ID usuario: {{ a.usuarioId ?? a.id }}</span>
+            </div>
+            <ion-button
+              fill="clear"
+              size="small"
+              class="accion-btn delete-btn"
+              [disabled]="guardandoAlumnosProyecto"
+              (click)="quitarAlumnoDeProyecto(a)"
+              title="Quitar del proyecto">
+              <ion-icon name="person-remove-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+          </div>
+        </div>
+
+        <div class="alumnos-vacio" *ngIf="alumnosDelProyecto.length === 0">
+          <ion-icon name="people-outline"></ion-icon>
+          <span>Sin alumnos inscritos aún.</span>
+        </div>
+      </div>
+
+      <hr class="alumnos-divider">
+
+      <!-- Buscador para agregar -->
+      <div class="alumnos-seccion">
+        <div class="alumnos-seccion-header">
+          <span class="alumnos-seccion-title">
+            <ion-icon name="person-add-outline"></ion-icon>
+            Añadir alumno
+          </span>
+        </div>
+
+        <ion-searchbar
+          placeholder="Buscar por nombre o ID..."
+          [(ngModel)]="busquedaAlumnosProyecto"
+          (ionInput)="filtrarCandidatos()"
+          style="--border-radius: 12px; padding: 0; margin-bottom: 10px;">
+        </ion-searchbar>
+
+        <div class="alumnos-candidatos-lista" *ngIf="candidatosProyecto.length > 0">
+          <div class="alumno-inscrito-row" *ngFor="let u of candidatosProyecto"
+               [class.alumno-row-sin-perfil]="!tienRegistroAlumno(u.id)">
+            <div class="alumno-inscrito-avatar" [class.avatar-sin-perfil]="!tienRegistroAlumno(u.id)">
+              <ion-icon [name]="u.rol?.toLowerCase() === 'administrador' ? 'shield-checkmark-outline' : 'person-outline'"></ion-icon>
+            </div>
+            <div class="alumno-inscrito-info">
+              <span class="alumno-inscrito-nombre">{{ u.nombreReal }}</span>
+              <span class="alumno-inscrito-id">
+                ID: {{ u.id }} · {{ u.rol }}
+                <span class="sin-perfil-tag" *ngIf="!tienRegistroAlumno(u.id)">· Sin perfil alumno</span>
+              </span>
+            </div>
+            <ion-button
+              fill="clear"
+              size="small"
+              class="accion-btn"
+              [class.add-btn]="tienRegistroAlumno(u.id) && !estaInscrito(u.id)"
+              [class.inscrito-btn]="estaInscrito(u.id)"
+              [class.sin-perfil-btn]="!tienRegistroAlumno(u.id)"
+              [disabled]="guardandoAlumnosProyecto || estaInscrito(u.id) || !tienRegistroAlumno(u.id)"
+              (click)="agregarAlumnoAProyecto(u)"
+              [title]="!tienRegistroAlumno(u.id) ? 'Sin perfil de alumno' : estaInscrito(u.id) ? 'Ya inscrito' : 'Añadir al proyecto'">
+              <ion-icon
+                [name]="estaInscrito(u.id) ? 'checkmark-circle-outline' : !tienRegistroAlumno(u.id) ? 'ban-outline' : 'person-add-outline'"
+                slot="icon-only">
+              </ion-icon>
+            </ion-button>
+          </div>
+        </div>
+
+        <div class="alumnos-vacio" *ngIf="candidatosProyecto.length === 0 && busquedaAlumnosProyecto.trim()">
+          <ion-icon name="search-outline"></ion-icon>
+          <span>No se encontraron usuarios.</span>
+        </div>
+        <div class="alumnos-vacio" *ngIf="candidatosProyecto.length === 0 && !busquedaAlumnosProyecto.trim()">
+          <ion-icon name="search-outline"></ion-icon>
+          <span>Escribe un nombre o ID para buscar.</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-guardar" style="width:100%" (click)="cerrarModalAlumnosProyecto()">
+        <ion-icon name="checkmark-outline"></ion-icon>
+        Cerrar
       </button>
     </div>
 

@@ -23,7 +23,9 @@ import {
   reorderThreeOutline, informationCircleOutline,
   // ── AFK ──────────────────────────────────────────────────────
   closeCircleOutline, checkmarkDoneCircleOutline,
-  chevronUpOutline, chevronDownOutline
+  chevronUpOutline, chevronDownOutline,
+  // ── Gestión alumnos proyecto ──────────────────────────────────
+  personAddOutline as personAddO, personRemoveOutline, banOutline
 } from 'ionicons/icons';
 import { alumno } from '../modelos/alumno';
 import { AlumnoService } from '../services/alumno-service';
@@ -122,6 +124,14 @@ export class HomeAdminPage implements OnInit {
   // ── TAREAS DE PROYECTO (admin) ────────────────────────────────────────────
   formTareas: string[] = [];          // títulos editables en el modal
   guardandoTareas: boolean = false;
+
+  // ── MODAL GESTIÓN ALUMNOS PROYECTO ────────────────────────────────────────
+  modalAlumnosProyectoAbierto: boolean = false;
+  proyectoGestionando: proyecto | null = null;
+  alumnosDelProyecto: any[] = [];          // alumnos ya inscritos (con usuarioId)
+  candidatosProyecto: Usuario[] = [];      // resultado de la búsqueda
+  busquedaAlumnosProyecto: string = '';
+  guardandoAlumnosProyecto: boolean = false;
   private asistenciaService = inject(AsistenciaService);
   private authService = inject(AuthService);
   private registroActividadService = inject(RegistroActividadService);
@@ -147,7 +157,11 @@ export class HomeAdminPage implements OnInit {
       reorderThreeOutline, informationCircleOutline,
       // ── AFK ────────────────────────────────────────────────
       closeCircleOutline, checkmarkDoneCircleOutline,
-      chevronUpOutline, chevronDownOutline
+      chevronUpOutline, chevronDownOutline,
+      // ── Gestión alumnos proyecto ──────────────────────────
+      'person-add-outline': personAddO,
+      personRemoveOutline,
+      banOutline
     });
   }
 
@@ -833,6 +847,101 @@ export class HomeAdminPage implements OnInit {
         next: () => resolve(),
         error: () => reject()
       });
+    });
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // MODAL GESTIÓN ALUMNOS DEL PROYECTO
+  // ─────────────────────────────────────────────────────────────
+
+  abrirModalAlumnosProyecto(p: proyecto) {
+    this.proyectoGestionando = p;
+    this.alumnosDelProyecto = [];
+    this.candidatosProyecto = [];
+    this.busquedaAlumnosProyecto = '';
+    this.guardandoAlumnosProyecto = false;
+    this.modalAlumnosProyectoAbierto = true;
+    this.cargarAlumnosDelProyecto(p.id);
+  }
+
+  cerrarModalAlumnosProyecto() {
+    this.modalAlumnosProyectoAbierto = false;
+    this.proyectoGestionando = null;
+    this.alumnosDelProyecto = [];
+    this.candidatosProyecto = [];
+    this.busquedaAlumnosProyecto = '';
+  }
+
+  private cargarAlumnosDelProyecto(proyectoId: number) {
+    this.proyectoService.getAlumnosPorProyecto(proyectoId).subscribe({
+      next: (lista) => { this.alumnosDelProyecto = lista; },
+      error: () => this.mostrarToast('Error al cargar los alumnos del proyecto', 'danger')
+    });
+  }
+
+  filtrarCandidatos() {
+    const q = this.busquedaAlumnosProyecto.trim().toLowerCase();
+    if (!q) {
+      this.candidatosProyecto = [];
+      return;
+    }
+    this.candidatosProyecto = this.usuarios.filter(u =>
+      u.nombreReal?.toLowerCase().includes(q) || u.id?.toString().includes(q)
+    );
+  }
+
+  tienRegistroAlumno(usuarioId: number): boolean {
+    return this.usuarioIdToAlumnoId.has(usuarioId);
+  }
+
+  // El backend devuelve UsuarioDTO donde `id` es el usuarioId
+  estaInscrito(usuarioId: number): boolean {
+    return this.alumnosDelProyecto.some(a => a.id === usuarioId);
+  }
+
+  agregarAlumnoAProyecto(u: Usuario) {
+    if (!this.proyectoGestionando) return;
+    if (this.estaInscrito(u.id)) {
+      this.mostrarToast(`${u.nombreReal} ya está inscrito`, 'warning');
+      return;
+    }
+    if (!this.tienRegistroAlumno(u.id)) {
+      this.mostrarToast(`⚠️ ${u.nombreReal} no tiene perfil de alumno — no se puede inscribir`, 'warning');
+      return;
+    }
+    this.guardandoAlumnosProyecto = true;
+    this.proyectoService.inscribirse(u.id, this.proyectoGestionando.id).subscribe({
+      next: () => {
+        this.guardandoAlumnosProyecto = false;
+        this.mostrarToast(`✅ ${u.nombreReal} añadido al proyecto`, 'success');
+        this.cargarAlumnosDelProyecto(this.proyectoGestionando!.id);
+      },
+      error: (err) => {
+        this.guardandoAlumnosProyecto = false;
+        const msg = err?.error?.mensaje ?? err?.error?.message ?? `Error ${err?.status ?? ''}`;
+        this.mostrarToast(`❌ ${msg}`, 'danger');
+        console.error('[agregarAlumnoAProyecto] error:', err);
+      }
+    });
+  }
+
+  quitarAlumnoDeProyecto(a: any) {
+    if (!this.proyectoGestionando) return;
+    // a es un UsuarioDTO: a.id es el usuarioId
+    const usuarioId: number = a.id;
+    this.guardandoAlumnosProyecto = true;
+    this.proyectoService.salir(usuarioId, this.proyectoGestionando.id).subscribe({
+      next: () => {
+        this.guardandoAlumnosProyecto = false;
+        this.mostrarToast('✅ Alumno eliminado del proyecto', 'success');
+        this.cargarAlumnosDelProyecto(this.proyectoGestionando!.id);
+      },
+      error: (err) => {
+        this.guardandoAlumnosProyecto = false;
+        const msg = err?.error?.mensaje ?? err?.error?.message ?? `Error ${err?.status ?? ''}`;
+        this.mostrarToast(`❌ ${msg}`, 'danger');
+        console.error('[quitarAlumnoDeProyecto] error:', err);
+      }
     });
   }
 }

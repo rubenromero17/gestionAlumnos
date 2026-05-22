@@ -1628,3 +1628,228 @@ $radius-input: 12px;
     background: #2d1f3d;
   }
 }
+
+// ── BOTÓN GESTIÓN USUARIOS (acción proyecto) ────────────────────────────────
+.accion-btn.users-btn {
+  --color: #7fb3ff;
+
+  &:hover { background: rgba(56, 128, 255, 0.15) !important; }
+}
+
+.accion-btn.add-btn {
+  --color: #6ae89a;
+
+  &:hover { background: rgba(45, 211, 111, 0.15) !important; }
+
+  &[disabled] {
+    --color: rgba(255,255,255,0.2);
+    opacity: 0.55;
+    pointer-events: none;
+  }
+}
+
+.accion-btn.inscrito-btn {
+  --color: #6ae89a;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.accion-btn.sin-perfil-btn {
+  --color: rgba(255,255,255,0.2);
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.alumno-row-sin-perfil {
+  opacity: 0.55;
+}
+
+.alumno-inscrito-avatar.avatar-sin-perfil {
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.3);
+  border-color: rgba(255,255,255,0.08);
+}
+
+.sin-perfil-tag {
+  color: rgba(235, 68, 90, 0.7);
+  font-style: italic;
+}
+
+// ── MODAL ALUMNOS PROYECTO ──────────────────────────────────────────────────
+.modal-card-alumnos {
+  max-width: 520px;
+}
+
+.modal-body-alumnos {
+  padding: 8px 24px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  max-height: 62vh;
+  overflow-y: auto;
+
+  // Scrollbar elegante sobre fondo oscuro
+  scrollbar-width: thin;
+  scrollbar-color: rgba(139,92,246,0.3) transparent;
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(139,92,246,0.35);
+    border-radius: 4px;
+  }
+}
+
+// ── Sección (inscritos / añadir) ─────────────────────────────────────────────
+.alumnos-seccion {
+  padding: 18px 0 14px;
+}
+
+.alumnos-seccion-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.alumnos-seccion-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: rgba(255,255,255,0.38);
+
+  ion-icon {
+    font-size: 0.95rem;
+    color: rgba(255,255,255,0.45);
+  }
+}
+
+.alumnos-count-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: rgba(56, 128, 255, 0.18);
+  color: #7fb3ff;
+  border: 1px solid rgba(56,128,255,0.2);
+}
+
+// ── Listas ───────────────────────────────────────────────────────────────────
+.alumnos-inscritos-lista,
+.alumnos-candidatos-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 190px;
+  overflow-y: auto;
+
+  scrollbar-width: thin;
+  scrollbar-color: rgba(139,92,246,0.25) transparent;
+  &::-webkit-scrollbar { width: 3px; }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(139,92,246,0.3);
+    border-radius: 3px;
+  }
+}
+
+// ── Fila alumno ──────────────────────────────────────────────────────────────
+.alumno-inscrito-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+  transition: background 0.15s, border-color 0.15s;
+
+  &:hover {
+    background: rgba(255,255,255,0.07);
+    border-color: rgba(255,255,255,0.12);
+  }
+}
+
+.alumno-inscrito-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(56, 128, 255, 0.18);
+  color: #7fb3ff;
+  border: 1px solid rgba(56,128,255,0.25);
+
+  ion-icon { font-size: 1.1rem; }
+
+  // Inscritos: tono verde
+  &.avatar-inscrito {
+    background: rgba(45, 211, 111, 0.15);
+    color: #6ae89a;
+    border-color: rgba(45,211,111,0.2);
+  }
+}
+
+.alumno-inscrito-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.alumno-inscrito-nombre {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #f0ecff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.alumno-inscrito-id {
+  font-size: 0.73rem;
+  color: rgba(255,255,255,0.35);
+  font-weight: 400;
+}
+
+// ── Estado vacío ─────────────────────────────────────────────────────────────
+.alumnos-vacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 22px 0;
+  color: rgba(255,255,255,0.25);
+  font-size: 0.83rem;
+  text-align: center;
+
+  ion-icon {
+    font-size: 1.8rem;
+    opacity: 0.5;
+  }
+}
+
+// ── Divisor ──────────────────────────────────────────────────────────────────
+.alumnos-divider {
+  border: none;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  margin: 0;
+}
+
+// ── Searchbar override (tema oscuro en modal) ────────────────────────────────
+.modal-body-alumnos ion-searchbar {
+  --background: rgba(255,255,255,0.06);
+  --color: #f0ecff;
+  --placeholder-color: rgba(255,255,255,0.28);
+  --icon-color: rgba(255,255,255,0.35);
+  --clear-button-color: rgba(255,255,255,0.35);
+  --border-radius: 12px;
+  --box-shadow: none;
+  padding-inline: 0;
+  margin-bottom: 10px;
+}
